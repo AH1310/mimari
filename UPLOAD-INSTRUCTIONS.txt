@@ -1,0 +1,1 @@
+Upload all website files to the GitHub Pages publishing folder (root or /docs). Keep filenames unchanged. Do not upload the ZIP itself as the website. After deployment, retest the live URL in PWABuilder.
