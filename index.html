@@ -54,11 +54,11 @@ dialog::backdrop{background:#0009}dialog pre{white-space:pre-wrap;font:14px Taho
 </style>
 </head>
 <body>
-<header><button id="menuBtn" onclick="toggleMenu()" aria-label="القائمة" aria-expanded="false">☰</button><h1>معماري <span style="color:#b9ed76">◈</span></h1><small>استوديو التصميم المعماري <span class="badge">بيتا</span></small>
+<header><button id="menuBtn" onclick="toggleMenu()" aria-label="القائمة" aria-expanded="false">☰</button><h1>معماري <span style="color:#b9ed76">◈</span></h1><small>استوديو التصميم المعماري </small>
 <div class="account"><button id="langBtn" onclick="switchLanguage()">English</button><button onclick="switchTheme()" aria-label="الوضع الليلي">◐</button><button id="accountBtn" onclick="openAuth()">تسجيل الدخول</button></div>
 <div class="actions"><button onclick="newProject()">مشروع جديد +</button><button onclick="save()">حفظ المشروع</button><button onclick="exportJSON()">تصدير</button><button onclick="pdf()">تنزيل PDF ↗</button></div></header>
 <div class="layout">
-<aside><div class="workspace-title"><b>معماري</b> <span class="badge">بيتا</span></div><h3>الرسم والتخطيط</h3><div class="tools" id="tools"></div>
+<aside><div class="workspace-title"><b>معماري</b> </div><h3>الرسم والتخطيط</h3><div class="tools" id="tools"></div>
 <div class="section"><h3>إعدادات الرسم</h3><label>اسم المشروع<input id="name" value="مشروع جديد — أرض فارغة"></label>
 <label>سُمك الجدار (م)<input id="thickness" type="number" min=".05" max="1" step=".05" value=".2"></label>
 <label><input id="snap" type="checkbox" checked> محاذاة إلى الشبكة</label>
@@ -76,7 +76,7 @@ dialog::backdrop{background:#0009}dialog pre{white-space:pre-wrap;font:14px Taho
 <div class="section"><h3>أدوات المعماري</h3><button onclick="analytics()">المساحات والتكلفة التقديرية</button><button onclick="exportDXF()">تصدير مخطط DXF</button><button onclick="layersPanel()">إدارة الطبقات</button><button onclick="fitPlan()">إظهار المخطط بالكامل</button><button onclick="downloadPreview()">تنزيل صورة المخطط PNG</button></div>
 <div class="section"><h3>مشاريعي — محلي وسحابي</h3><p id="cloudStatus" class="hint">المشاريع المحلية متاحة دون إنترنت.</p><div id="projects"></div></div>
 <div class="section"><button onclick="downloadSVG()">تنزيل رسم SVG</button><p class="hint">التخطيط المبدئي ثنائي الأبعاد، والوحدات بالمتر.</p></div></aside></div>
-<div id="veil" hidden onclick="toggleMenu(false)"></div><nav id="drawer" hidden><button onclick="toggleMenu(false)">✕ إغلاق القائمة</button><h2>معماري · بيتا</h2><div id="navActions"></div><a href="https://ahmedhafezfrontend-ah13.netlify.app/" target="_blank" rel="noopener noreferrer">مطوّر الموقع AH13 ↗</a></nav>
+<div id="veil" hidden onclick="toggleMenu(false)"></div><nav id="drawer" hidden><button onclick="toggleMenu(false)">✕ إغلاق القائمة</button><h2>معماري</h2><div id="navActions"></div><a href="https://ahmedhafezfrontend-ah13.netlify.app/" target="_blank" rel="noopener noreferrer">مطوّر الموقع AH13 ↗</a></nav>
 <dialog id="auth"><button onclick="document.getElementById('auth').close()">✕</button><h2 id="authTitle">أهلًا بعودتك</h2><p class="hint">تسجيل الحساب والمشاريع السحابية عبر Supabase.</p><button onclick="authMode(false)">تسجيل الدخول</button> <button onclick="authMode(true)">إنشاء حساب</button>
 <form id="authForm"><label id="fullLabel" hidden>الاسم<input id="fullName" autocomplete="name"></label><label>البريد الإلكتروني<input id="email" type="email" required></label><label>كلمة المرور<input id="password" type="password" minlength="8" required></label><p id="authMsg" role="alert"></p><button type="submit">متابعة</button></form></dialog>
 <dialog id="dialog"><h2 id="dialogTitle">معماري</h2><pre id="help"></pre><div id="dialogExtra"></div><button onclick="document.getElementById('dialog').close()">إغلاق</button></dialog>
@@ -143,7 +143,7 @@ $('command').addEventListener('keydown',e=>{if(e.key==='Enter')runCommand()});
 function toggleMenu(force){let open=force===undefined?$('drawer').hidden:force;$('drawer').hidden=!open;$('veil').hidden=!open;$('menuBtn').setAttribute('aria-expanded',String(open))}
 function switchTheme(){document.body.classList.toggle('night');localStorage.setItem('mimari-theme',document.body.classList.contains('night')?'night':'day')}
 if(localStorage.getItem('mimari-theme')==='night')document.body.classList.add('night');
-function switchLanguage(){lang=lang==='ar'?'en':'ar';localStorage.setItem('mimari-language',lang);document.documentElement.lang=lang;document.documentElement.dir=lang==='ar'?'rtl':'ltr';$('langBtn').textContent=lang==='ar'?'English':'العربية';toast(lang==='en'?'English interface: partial translation':'تم اختيار العربية')}
+function switchLanguage(){lang=lang==='ar'?'en':'ar';localStorage.setItem('mimari-language',lang);applyLanguage();render()}
 const phases=['دراسة الموقع','التصميم المبدئي','التصميم والتنسيق','التراخيص','الكميات والتعاقد','التنفيذ','الاستلام والتسليم'];
 function workflowKey(){return projectKey()+'-workflow-'+projectId}
 function projectHub(){showDialog('دورة المشروع والمهام','');let box=$('dialogExtra'),data={};try{data=JSON.parse(localStorage.getItem(workflowKey())||'{}')}catch{}phases.forEach((p,i)=>{let div=document.createElement('div');div.className='metric';let h=document.createElement('h3');h.textContent=(i+1)+'. '+p;div.append(h);['المراجعة','الاعتماد','التوثيق'].forEach((t,j)=>{let l=document.createElement('label'),check=document.createElement('input');check.type='checkbox';check.checked=!!data[i+'-'+j];check.onchange=()=>{data[i+'-'+j]=check.checked;localStorage.setItem(workflowKey(),JSON.stringify(data))};l.append(check,document.createTextNode(' '+t));div.append(l)});let note=document.createElement('textarea');note.placeholder='ملاحظات المرحلة';note.value=data['note'+i]||'';note.onchange=()=>{data['note'+i]=note.value;localStorage.setItem(workflowKey(),JSON.stringify(data))};div.append(note);box.append(div)})}
@@ -181,5 +181,140 @@ async function save(){let backup=false;try{localSave();backup=true}catch{}if(!cl
 async function list(){let seq=++cloudListVersion;if(!cloudSession){localList();$('cloudStatus').textContent='وضع محلي — سجّل الدخول للمشاريع السحابية';return}let owner=cloudSession.user.id;$('cloudStatus').textContent='جارٍ تحميل المشاريع…';try{let rows=await supaRequest('/rest/v1/mimari_projects?select=id,name,updated_at&user_id=eq.'+encodeURIComponent(owner)+'&order=updated_at.desc&limit=100',{auth:true});if(seq!==cloudListVersion||cloudSession?.user.id!==owner)return;let box=$('projects');box.replaceChildren();for(const row of rows){let b=document.createElement('button');b.textContent=row.name;b.onclick=async()=>{if(!confirm('فتح المشروع؟ احفظ التعديلات الحالية أولًا.'))return;b.disabled=true;try{let records=await supaRequest('/rest/v1/mimari_projects?id=eq.'+encodeURIComponent(row.id)+'&user_id=eq.'+encodeURIComponent(owner)+'&select=id,name,drawing,workflow&limit=1',{auth:true});let p=records?.[0];if(!p||!Array.isArray(p.drawing?.items)||!p.drawing.items.every(v=>Object.hasOwn(labels,v.type)&&Number.isFinite(v.x)&&Number.isFinite(v.y)))throw Error('ملف المشروع غير صالح');items=p.drawing.items;projectId=p.id;$('name').value=p.name;try{localStorage.setItem(workflowKey(),JSON.stringify(p.workflow||{}))}catch{}selected=-1;history=[];future=[];fitPlan();render();toast('تم فتح المشروع السحابي')}catch(e){toast(e.message)}finally{b.disabled=false}};box.append(b)}$('cloudStatus').textContent=rows.length?'مشاريعك السحابية':'لا توجد مشاريع سحابية بعد'}catch(e){if(seq!==cloudListVersion)return;localList();$('cloudStatus').textContent=e.message+' — المعروض نسخ محلية'}}
 accountUI();list();render();
 if('serviceWorker' in navigator&&location.protocol.startsWith('http'))window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(e=>console.warn('Service worker:',e)));
+</script>
+<script>
+/* Mimari bilingual UI. User-entered names and drawing labels are never translated. */
+const enUI = {
+'معماري':'Mimari','استوديو التصميم المعماري':'Architectural Design Studio',
+'القائمة':'Menu','الوضع الليلي':'Dark mode','تكبير':'Zoom in','تصغير':'Zoom out','إظهار الكل':'Fit all',
+'تسجيل الدخول':'Sign in','إنشاء حساب':'Create account','مشروع جديد +':'+ New project','مشروع جديد':'New project',
+'حفظ المشروع':'Save project','تصدير':'Export','تنزيل PDF ↗':'Download PDF ↗',
+'الرسم والتخطيط':'Drawing & planning','إعدادات الرسم':'Drawing settings','اسم المشروع':'Project name',
+'سُمك الجدار (م)':'Wall thickness (m)','محاذاة إلى الشبكة':'Snap to grid','إظهار الشبكة':'Show grid',
+'إظهار الأبعاد بالمتر':'Show dimensions in meters','رسم بأبعاد دقيقة':'Draw exact dimensions',
+'التكبير':'Zoom','تراجع ↶':'Undo ↶','إعادة ↷':'Redo ↷','استيراد مشروع':'Import project',
+'دليل الاستخدام':'User guide','تحديد / تحريك':'Select / move','جدار':'Wall','غرفة':'Room',
+'باب':'Door','نافذة':'Window','خط':'Line','قياس':'Measure','نص':'Text','سلم':'Stairs',
+'دائرة':'Circle','حدود الأرض':'Plot boundary','حديقة':'Garden','ممر':'Path','مسبح':'Pool',
+'موقف سيارة':'Parking','شجرة':'Tree','مخطط ثنائي الأبعاد':'2D floor plan','تنفيذ':'Run',
+'لوحة المشروع / معماري':'Project panel / Mimari','مساحة عمل':'Workspace',
+'لأفكارك المعمارية.':'For your architectural ideas.',
+'ارسم حدود الأرض والمبنى والحديقة، واحفظ كل نسخة من تصميمك.':'Draw your plot, building and garden, and save every version of your design.',
+'العنصر المحدد':'Selected element','اضغط على عنصر لتحديده':'Tap an element to select it',
+'حذف العنصر':'Delete element','نسخ العنصر':'Duplicate element','أدوات المعماري':'Architectural tools',
+'المساحات والتكلفة التقديرية':'Areas and estimated cost','تصدير مخطط DXF':'Export DXF drawing',
+'إدارة الطبقات':'Manage layers','إظهار المخطط بالكامل':'Fit entire plan',
+'تنزيل صورة المخطط PNG':'Download plan PNG','مشاريعي — محلي وسحابي':'My projects — local & cloud',
+'المشاريع المحلية متاحة دون إنترنت.':'Local projects are available offline.',
+'تنزيل رسم SVG':'Download SVG drawing','التخطيط المبدئي ثنائي الأبعاد، والوحدات بالمتر.':'Preliminary 2D planning; measurements are in meters.',
+'✕ إغلاق القائمة':'✕ Close menu','مطوّر الموقع AH13 ↗':'Developer AH13 ↗',
+'أهلًا بعودتك':'Welcome back','أنشئ مساحة عملك':'Create your workspace',
+'تسجيل الحساب والمشاريع السحابية عبر Supabase.':'Account sign-in and cloud projects powered by Supabase.',
+'الاسم':'Name','البريد الإلكتروني':'Email','كلمة المرور':'Password','متابعة':'Continue','إغلاق':'Close',
+'دورة المشروع والمهام':'Project workflow and tasks','تنزيل وتثبيت التطبيق':'Download and install app',
+'جدول الغرف والتشطيبات':'Room and finishes schedule','تصدير جدول CSV':'Export CSV schedule',
+'كميات الجدران':'Wall quantities','حاسبة السلم':'Stair calculator','تحويل الوحدات':'Unit conversion',
+'تعديل اسم المساحة':'Edit area name','تدوير العنصر ٩٠ درجة':'Rotate element 90°',
+'عكس العنصر':'Mirror element','تقرير المشروع TXT':'Project report TXT',
+'ملخص الموقع والمساحات':'Site and area summary','المساحات والتكلفة':'Areas and cost',
+'صورة المخطط PNG':'Plan image PNG','رسم SVG':'SVG drawing','تصدير المشروع JSON':'Export project JSON',
+'طباعة / PDF':'Print / PDF','الحساب':'Account','تسجيل الخروج':'Sign out',
+'دراسة الموقع':'Site study','التصميم المبدئي':'Concept design','التصميم والتنسيق':'Design and coordination',
+'التراخيص':'Permits','الكميات والتعاقد':'Quantities and contracting','التنفيذ':'Construction',
+'الاستلام والتسليم':'Handover','المراجعة':'Review','الاعتماد':'Approval','التوثيق':'Documentation',
+'ملاحظات المرحلة':'Stage notes','ملخص الموقع والمساحات':'Site and area summary',
+'غير محدد':'Not specified','بورسلين':'Porcelain','سيراميك':'Ceramic','رخام':'Marble',
+'باركيه':'Parquet','موكيت':'Carpet','الموضع الأفقي':'Horizontal position',
+'الموضع الرأسي':'Vertical position','العرض / الامتداد الأفقي':'Width / horizontal extent',
+'الطول / الامتداد الرأسي':'Length / vertical extent',
+'المشاريع المحلية متاحة دون إنترنت.':'Local projects are available offline.',
+'وضع محلي — سجّل الدخول للمشاريع السحابية':'Local mode — sign in for cloud projects',
+'جارٍ تحميل المشاريع…':'Loading projects…','مشاريعك السحابية':'Your cloud projects',
+'لا توجد مشاريع سحابية بعد':'No cloud projects yet',
+'جارٍ الحفظ السحابي…':'Saving to cloud…','تم تأكيد الحفظ السحابي':'Cloud save confirmed',
+'تم حفظ المشروع في Supabase':'Project saved to Supabase','تم تسجيل الدخول':'Signed in',
+'جارٍ الاتصال…':'Connecting…','تم استيراد المشروع':'Project imported',
+'ملف المشروع غير صالح':'Invalid project file','تم فتح المشروع السحابي':'Cloud project opened',
+'ابدأ بأرضك، وارسم فكرتك':'Start with your plot and draw your idea',
+'اختر حدود الأرض ثم اسحب للرسم':'Select Plot boundary, then drag to draw',
+'تم اختيار العربية':'Arabic selected','المساحات والتكلفة':'Areas and cost',
+'إجمالي مساحات الغرف':'Total room area','عدد الغرف':'Room count','أطوال الجدران':'Wall lengths',
+'التكلفة التقديرية':'Estimated cost','تقرير مشروع معماري':'Mimari project report',
+'تقرير تخطيطي مبدئي فقط':'Preliminary planning report only',
+'تقرير المشروع TXT':'Project report TXT','مخطط':'Plan',
+'لا توجد مشاريع سحابية بعد':'No cloud projects yet',
+'سجّل الدخول أولًا':'Sign in first','انتهت مهلة الاتصال':'Connection timed out',
+'تعذر الاتصال بـ Supabase':'Unable to connect to Supabase',
+'تم الحفظ محليًا. سجّل الدخول للحفظ السحابي.':'Saved locally. Sign in to save to the cloud.',
+'تعذر الحفظ المحلي، صدّر JSON':'Local save failed; export JSON',
+'فشل الحفظ السحابي؛ النسخة المحلية محفوظة.':'Cloud save failed; local copy is saved.',
+'فشل الحفظ؛ صدّر JSON':'Save failed; export JSON',
+'ارسم مخططًا أولًا':'Draw a plan first','أدخل تكلفة صحيحة':'Enter a valid cost',
+'حدد عنصرًا':'Select an element','نوع غير صالح':'Invalid type','أبعاد غير صالحة':'Invalid dimensions',
+'نصف القطر يجب أن يكون موجبًا':'Radius must be positive',
+'أدخل أرقامًا صالحة':'Enter valid numbers',
+'المعروض نسخ محلية':'Showing local copies',
+'اختر حفظ بتنسيق PDF من نافذة الطباعة':'Choose Save as PDF in the print dialog',
+'تسجيل الحساب والمشاريع السحابية عبر Supabase.':'Sign-in and cloud projects via Supabase.',
+'تحقق من بريدك الإلكتروني ثم سجّل الدخول، إذا كان التأكيد مفعلًا.':'Check your email and sign in if email confirmation is enabled.'
+};
+const uiOriginalText = new WeakMap();
+const uiOriginalAttr = new WeakMap();
+let applyingUI = false;
+function translateUIValue(value) {
+  const raw = String(value), v = raw.trim();
+  if (Object.hasOwn(enUI, v)) return raw.replace(v, enUI[v]);
+  let m;
+  if ((m = v.match(/^(\d+) عنصر • الشبكة: ١ متر • التكبير (\d+)٪ • (.+)$/)))
+    return `${m[1]} elements • Grid: 1 m • Zoom: ${m[2]}% • ${enUI[m[3]] || m[3]}`;
+  if ((m = v.match(/^(.+) — ([\d.]+) × ([\d.]+) م$/)))
+    return `${enUI[m[1]] || m[1]} — ${m[2]} × ${m[3]} m`;
+  if ((m = v.match(/^(.+) \(م\)$/))) return `${enUI[m[1]] || m[1]} (m)`;
+  if ((m = v.match(/^(\d+)\. (.+)$/))) return `${m[1]}. ${enUI[m[2]] || m[2]}`;
+  if (v.endsWith(' · خروج')) return v.replace(' · خروج', ' · Sign out');
+  return raw;
+}
+function applyLanguage() {
+  if (applyingUI) return;
+  applyingUI = true;
+  try {
+    const english = lang === 'en';
+    document.documentElement.lang = english ? 'en' : 'ar';
+    document.documentElement.dir = english ? 'ltr' : 'rtl';
+    document.title = english ? 'Mimari | Design Workspace' : 'معماري | مساحة التصميم';
+    $('langBtn').textContent = english ? 'العربية' : 'English';
+    document.querySelectorAll('[data-tool]').forEach(b => {
+      b.textContent = english ? enUI[labels[b.dataset.tool]] : labels[b.dataset.tool];
+    });
+    const skip = 'script,style,#projects,#name,#help,#authMsg,#email,#fullName,#password,#dialogExtra';
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    let node;
+    while ((node = walker.nextNode())) {
+      const parent = node.parentElement;
+      if (!parent || parent.closest(skip) || parent.closest('[data-tool]') || parent.id === 'langBtn') continue;
+      if (!uiOriginalText.has(node)) uiOriginalText.set(node, node.nodeValue);
+      const original = uiOriginalText.get(node);
+      const output = english ? translateUIValue(original) : original;
+      if (node.nodeValue !== output) node.nodeValue = output;
+    }
+    document.querySelectorAll('[placeholder],[aria-label]').forEach(el => {
+      if (el.matches('#name,#command') || el.closest('#projects,#dialogExtra')) return;
+      if (!uiOriginalAttr.has(el)) uiOriginalAttr.set(el, {
+        placeholder: el.getAttribute('placeholder'), aria: el.getAttribute('aria-label')
+      });
+      const original = uiOriginalAttr.get(el);
+      for (const [key, attr] of [['placeholder','placeholder'],['aria','aria-label']]) {
+        if (original[key] !== null) el.setAttribute(attr, english ? translateUIValue(original[key]) : original[key]);
+      }
+    });
+    // These values are user-owned data, and are deliberately left unchanged:
+    // #name, #projects, project titles, room labels and custom canvas text.
+  } finally { applyingUI = false; }
+}
+const uiObserver = new MutationObserver(() => {
+  if (!applyingUI) applyLanguage();
+});
+uiObserver.observe(document.body, {childList:true,subtree:true,characterData:true});
+applyLanguage();
 </script>
 </body></html>
