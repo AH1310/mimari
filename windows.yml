@@ -1,0 +1,116 @@
+name: Build MIMARI Windows Store package
+
+on:
+  workflow_dispatch:
+    inputs:
+      identity_name:
+        description: 'Exact Package/Identity/Name from Microsoft Partner Center'
+        required: true
+        type: string
+      publisher:
+        description: 'Exact Package/Identity/Publisher (CN=...) from Partner Center'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Get MIMARI files
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Generate Electron wrapper and Store metadata
+        shell: pwsh
+        env:
+          STORE_IDENTITY: ${{ inputs.identity_name }}
+          STORE_PUBLISHER: ${{ inputs.publisher }}
+        run: |
+          if (-not (Test-Path 'icon-512.png')) { throw 'icon-512.png is missing from repository root' }
+          if ($env:STORE_IDENTITY -notmatch '^[A-Za-z0-9.-]{3,50}$') { throw 'Copy the exact valid identity name from Partner Center' }
+          if (-not $env:STORE_PUBLISHER.StartsWith('CN=')) { throw 'Copy the exact CN= publisher string from Partner Center' }
+          New-Item -ItemType Directory -Force -Path 'windows-app/build/appx' | Out-Null
+          @'
+          const {app, BrowserWindow, shell} = require('electron');
+          const URL = 'https://ah1310.github.io/mimari/';
+          function createWindow() {
+            const win = new BrowserWindow({
+              width: 1200, height: 800, minWidth: 420, minHeight: 600,
+              autoHideMenuBar: true,
+              webPreferences: {nodeIntegration: false, contextIsolation: true, sandbox: true}
+            });
+            win.webContents.setWindowOpenHandler(({url}) => {
+              if (url.startsWith('https://')) shell.openExternal(url);
+              return {action: 'deny'};
+            });
+            win.loadURL(URL);
+          }
+          app.whenReady().then(createWindow);
+          app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit(); });
+          '@ | Set-Content -Encoding UTF8 'windows-app/main.js'
+          @'
+          {"name":"mimari-windows","version":"1.0.0","description":"MIMARI architectural planning app","main":"main.js","author":"AH13","license":"UNLICENSED","private":true,"devDependencies":{"electron":"^37.0.0","electron-builder":"^26.0.0"}}
+          '@ | Set-Content -Encoding UTF8 'windows-app/package.json'
+          $cfg = @{
+            appId = 'com.ah13.mimari'
+            productName = 'MIMARI'
+            directories = @{ output = 'dist'; buildResources = 'build' }
+            files = @('main.js', 'package.json')
+            win = @{ target = @(@{ target = 'appx'; arch = @('x64') }) }
+            appx = @{
+              identityName = $env:STORE_IDENTITY
+              publisher = $env:STORE_PUBLISHER
+              publisherDisplayName = 'AH13'
+              displayName = 'MIMARI'
+              applicationId = 'MIMARI'
+              languages = @('en-US', 'ar-SA')
+            }
+          }
+          $cfg | ConvertTo-Json -Depth 10 | Set-Content -Encoding UTF8 'windows-app/electron-builder.json'
+          Add-Type -AssemblyName System.Drawing
+          $source = [System.Drawing.Image]::FromFile((Resolve-Path 'icon-512.png'))
+          try {
+            $sizes = @{
+              'StoreLogo.png' = @(50,50)
+              'Square150x150Logo.png' = @(150,150)
+              'Square44x44Logo.png' = @(44,44)
+              'Wide310x150Logo.png' = @(310,150)
+            }
+            foreach ($name in $sizes.Keys) {
+              $w = $sizes[$name][0]; $h = $sizes[$name][1]
+              $bmp = New-Object System.Drawing.Bitmap($w,$h)
+              $g = [System.Drawing.Graphics]::FromImage($bmp)
+              try {
+                $g.Clear([System.Drawing.Color]::FromArgb(20,29,46))
+                $g.InterpolationMode = [System.Drawing.Drawing2D.InterpolationMode]::HighQualityBicubic
+                $side = [Math]::Min($w,$h)
+                $x = [int](($w-$side)/2); $y = [int](($h-$side)/2)
+                $g.DrawImage($source,$x,$y,$side,$side)
+                $bmp.Save((Join-Path (Resolve-Path 'windows-app/build/appx') $name), [System.Drawing.Imaging.ImageFormat]::Png)
+              } finally { $g.Dispose(); $bmp.Dispose() }
+            }
+          } finally { $source.Dispose() }
+
+      - name: Install dependencies
+        working-directory: windows-app
+        run: npm install --no-audit --no-fund
+
+      - name: Build Windows AppX
+        working-directory: windows-app
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+        run: npx electron-builder --win appx --x64 --publish never
+
+      - name: Upload Windows package
+        uses: actions/upload-artifact@v4
+        with:
+          name: MIMARI-Windows-Store-Package
+          path: windows-app/dist/*.appx
+          if-no-files-found: error
