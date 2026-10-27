@@ -52,6 +52,7 @@ dialog::backdrop{background:#0009}dialog pre{white-space:pre-wrap;font:14px Taho
 @media(max-width:380px){header h1{font-size:17px}.account button{padding:6px 4px;font-size:10px}.layout>main{height:55dvh;min-height:310px}}
 @media print{header,aside,.pill,.status,#commandBar,.mobile-tools,dialog,#toast,#drawer,#veil{display:none!important}.layout{display:block;height:auto}main{height:90vh;background:white}body{background:white}@page{size:A4 landscape;margin:10mm}}
 </style>
+<style>header .actions{margin-right:0;margin-inline-start:auto}.tools button,#projects button,#drawer button{text-align:start}.tools button{border-right:1px solid var(--edge);border-inline-start:3px solid #bacced}aside{border-left:0;border-inline-end:1px solid var(--edge)}.right{border-right:0;border-inline-start:1px solid var(--edge)}#drawer{right:auto;inset-inline-end:0}.pill{right:auto;inset-inline-end:12px}input,textarea{unicode-bidi:plaintext}input[type=email],input[type=number]{direction:ltr}@media(max-width:800px){.account{margin-right:0;margin-inline-start:auto}header .actions{margin:0}}</style>
 </head>
 <body>
 <header><button id="menuBtn" onclick="toggleMenu()" aria-label="القائمة" aria-expanded="false">☰</button><h1>معماري <span style="color:#b9ed76">◈</span></h1><small>استوديو التصميم المعماري </small>
@@ -81,12 +82,261 @@ dialog::backdrop{background:#0009}dialog pre{white-space:pre-wrap;font:14px Taho
 <form id="authForm"><label id="fullLabel" hidden>الاسم<input id="fullName" autocomplete="name"></label><label>البريد الإلكتروني<input id="email" type="email" required></label><label>كلمة المرور<input id="password" type="password" minlength="8" required></label><p id="authMsg" role="alert"></p><button type="submit">متابعة</button></form></dialog>
 <dialog id="dialog"><h2 id="dialogTitle">معماري</h2><pre id="help"></pre><div id="dialogExtra"></div><button onclick="document.getElementById('dialog').close()">إغلاق</button></dialog>
 <div id="toast" role="status"></div>
+
+
+
+<script>const uiDictionary={
+  "معماري": "Mimari",
+  "استوديو التصميم المعماري": "Architectural Design Studio",
+  "القائمة": "Menu",
+  "الوضع الليلي": "Dark mode",
+  "تكبير": "Zoom in",
+  "تصغير": "Zoom out",
+  "إظهار الكل": "Fit all",
+  "تسجيل الدخول": "Sign in",
+  "إنشاء حساب": "Create account",
+  "مشروع جديد +": "+ New project",
+  "مشروع جديد": "New project",
+  "حفظ المشروع": "Save project",
+  "تصدير": "Export",
+  "تنزيل PDF ↗": "Download PDF ↗",
+  "الرسم والتخطيط": "Drawing & planning",
+  "إعدادات الرسم": "Drawing settings",
+  "اسم المشروع": "Project name",
+  "سُمك الجدار (م)": "Wall thickness (m)",
+  "محاذاة إلى الشبكة": "Snap to grid",
+  "إظهار الشبكة": "Show grid",
+  "إظهار الأبعاد بالمتر": "Show dimensions in meters",
+  "رسم بأبعاد دقيقة": "Draw exact dimensions",
+  "التكبير": "Zoom",
+  "تراجع ↶": "Undo ↶",
+  "إعادة ↷": "Redo ↷",
+  "استيراد مشروع": "Import project",
+  "دليل الاستخدام": "User guide",
+  "تحديد / تحريك": "Select / move",
+  "جدار": "Wall",
+  "غرفة": "Room",
+  "باب": "Door",
+  "نافذة": "Window",
+  "خط": "Line",
+  "قياس": "Measure",
+  "نص": "Text",
+  "سلم": "Stairs",
+  "دائرة": "Circle",
+  "حدود الأرض": "Plot boundary",
+  "حديقة": "Garden",
+  "ممر": "Path",
+  "مسبح": "Pool",
+  "موقف سيارة": "Parking",
+  "شجرة": "Tree",
+  "مخطط ثنائي الأبعاد": "2D floor plan",
+  "تنفيذ": "Run",
+  "لوحة المشروع / معماري": "Project panel / Mimari",
+  "مساحة عمل": "Workspace",
+  "لأفكارك المعمارية.": "For your architectural ideas.",
+  "ارسم حدود الأرض والمبنى والحديقة، واحفظ كل نسخة من تصميمك.": "Draw your plot, building and garden, and save every version of your design.",
+  "العنصر المحدد": "Selected element",
+  "اضغط على عنصر لتحديده": "Tap an element to select it",
+  "حذف العنصر": "Delete element",
+  "نسخ العنصر": "Duplicate element",
+  "أدوات المعماري": "Architectural tools",
+  "المساحات والتكلفة التقديرية": "Areas and estimated cost",
+  "تصدير مخطط DXF": "Export DXF drawing",
+  "إدارة الطبقات": "Manage layers",
+  "إظهار المخطط بالكامل": "Fit entire plan",
+  "تنزيل صورة المخطط PNG": "Download plan PNG",
+  "مشاريعي — محلي وسحابي": "My projects — local & cloud",
+  "المشاريع المحلية متاحة دون إنترنت.": "Local projects are available offline.",
+  "تنزيل رسم SVG": "Download SVG drawing",
+  "التخطيط المبدئي ثنائي الأبعاد، والوحدات بالمتر.": "Preliminary 2D planning; measurements are in meters.",
+  "✕ إغلاق القائمة": "✕ Close menu",
+  "مطوّر الموقع AH13 ↗": "Developer AH13 ↗",
+  "أهلًا بعودتك": "Welcome back",
+  "أنشئ مساحة عملك": "Create your workspace",
+  "تسجيل الحساب والمشاريع السحابية عبر Supabase.": "Sign-in and cloud projects via Supabase.",
+  "الاسم": "Name",
+  "البريد الإلكتروني": "Email",
+  "كلمة المرور": "Password",
+  "متابعة": "Continue",
+  "إغلاق": "Close",
+  "دورة المشروع والمهام": "Project workflow and tasks",
+  "تنزيل وتثبيت التطبيق": "Download and install app",
+  "جدول الغرف والتشطيبات": "Room and finishes schedule",
+  "تصدير جدول CSV": "Export CSV schedule",
+  "كميات الجدران": "Wall quantities",
+  "حاسبة السلم": "Stair calculator",
+  "تحويل الوحدات": "Unit conversion",
+  "تعديل اسم المساحة": "Edit area name",
+  "تدوير العنصر ٩٠ درجة": "Rotate element 90°",
+  "عكس العنصر": "Mirror element",
+  "تقرير المشروع TXT": "Project report TXT",
+  "ملخص الموقع والمساحات": "Site and area summary",
+  "المساحات والتكلفة": "Areas and cost",
+  "صورة المخطط PNG": "Plan image PNG",
+  "رسم SVG": "SVG drawing",
+  "تصدير المشروع JSON": "Export project JSON",
+  "طباعة / PDF": "Print / PDF",
+  "الحساب": "Account",
+  "تسجيل الخروج": "Sign out",
+  "دراسة الموقع": "Site study",
+  "التصميم المبدئي": "Concept design",
+  "التصميم والتنسيق": "Design and coordination",
+  "التراخيص": "Permits",
+  "الكميات والتعاقد": "Quantities and contracting",
+  "التنفيذ": "Construction",
+  "الاستلام والتسليم": "Handover",
+  "المراجعة": "Review",
+  "الاعتماد": "Approval",
+  "التوثيق": "Documentation",
+  "ملاحظات المرحلة": "Stage notes",
+  "غير محدد": "Not specified",
+  "بورسلين": "Porcelain",
+  "سيراميك": "Ceramic",
+  "رخام": "Marble",
+  "باركيه": "Parquet",
+  "موكيت": "Carpet",
+  "الموضع الأفقي": "Horizontal position",
+  "الموضع الرأسي": "Vertical position",
+  "العرض / الامتداد الأفقي": "Width / horizontal extent",
+  "الطول / الامتداد الرأسي": "Length / vertical extent",
+  "وضع محلي — سجّل الدخول للمشاريع السحابية": "Local mode — sign in for cloud projects",
+  "جارٍ تحميل المشاريع…": "Loading projects…",
+  "مشاريعك السحابية": "Your cloud projects",
+  "لا توجد مشاريع سحابية بعد": "No cloud projects yet",
+  "جارٍ الحفظ السحابي…": "Saving to cloud…",
+  "تم تأكيد الحفظ السحابي": "Cloud save confirmed",
+  "تم حفظ المشروع في Supabase": "Project saved to Supabase",
+  "تم تسجيل الدخول": "Signed in",
+  "جارٍ الاتصال…": "Connecting…",
+  "تم استيراد المشروع": "Project imported",
+  "ملف المشروع غير صالح": "Invalid project file",
+  "تم فتح المشروع السحابي": "Cloud project opened",
+  "ابدأ بأرضك، وارسم فكرتك": "Start with your plot and draw your idea",
+  "اختر حدود الأرض ثم اسحب للرسم": "Select Plot boundary, then drag to draw",
+  "تم اختيار العربية": "Arabic selected",
+  "إجمالي مساحات الغرف": "Total room area",
+  "عدد الغرف": "Room count",
+  "أطوال الجدران": "Wall lengths",
+  "التكلفة التقديرية": "Estimated cost",
+  "تقرير مشروع معماري": "Mimari project report",
+  "تقرير تخطيطي مبدئي فقط": "Preliminary planning report only",
+  "مخطط": "Plan",
+  "سجّل الدخول أولًا": "Sign in first",
+  "انتهت مهلة الاتصال": "Connection timed out",
+  "تعذر الاتصال بـ Supabase": "Unable to connect to Supabase",
+  "تم الحفظ محليًا. سجّل الدخول للحفظ السحابي.": "Saved locally. Sign in to save to the cloud.",
+  "تعذر الحفظ المحلي، صدّر JSON": "Local save failed; export JSON",
+  "فشل الحفظ السحابي؛ النسخة المحلية محفوظة.": "Cloud save failed; local copy is saved.",
+  "فشل الحفظ؛ صدّر JSON": "Save failed; export JSON",
+  "ارسم مخططًا أولًا": "Draw a plan first",
+  "أدخل تكلفة صحيحة": "Enter a valid cost",
+  "حدد عنصرًا": "Select an element",
+  "نوع غير صالح": "Invalid type",
+  "أبعاد غير صالحة": "Invalid dimensions",
+  "نصف القطر يجب أن يكون موجبًا": "Radius must be positive",
+  "أدخل أرقامًا صالحة": "Enter valid numbers",
+  "المعروض نسخ محلية": "Showing local copies",
+  "اختر حفظ بتنسيق PDF من نافذة الطباعة": "Choose Save as PDF in the print dialog",
+  "تحقق من بريدك الإلكتروني ثم سجّل الدخول، إذا كان التأكيد مفعلًا.": "Check your email and sign in if email confirmation is enabled.",
+  "م": "m",
+  "م²": "m²",
+  "م³": "m³",
+  "سم": "cm",
+  "مم": "mm",
+  "متر": "meters",
+  "قدم": "ft",
+  "اكتب النص": "Enter text",
+  "اسم الغرفة": "Room name",
+  "فتح المشروع واستبدال الرسم الحالي؟": "Open this project and replace the current drawing?",
+  "بدء مشروع فارغ؟ احفظ الرسم الحالي أولًا.": "Start an empty project? Save the current drawing first.",
+  "مشروع مستورد": "Imported project",
+  "معماري.json": "mimari.json",
+  "مخطط.svg": "plan.svg",
+  "تكلفة تقريبية للمتر المربع": "Estimated cost per square meter",
+  "النوع: plot / room / wall / garden / path / pool / parking / circle": "Type: plot / room / wall / garden / path / pool / parking / circle",
+  "أدخل x,y,width,height بالمتر": "Enter x,y,width,height in meters",
+  "الغرفة": "Room",
+  "العرض م": "Width m",
+  "الطول م": "Length m",
+  "المساحة م²": "Area m²",
+  "تشطيب الأرضية": "Floor finish",
+  "ارتفاع الجدران بالمتر": "Wall height in meters",
+  "ارتفاع الطابق بالمتر": "Floor height in meters",
+  "ارتفاع القائمة المستهدف بالسنتيمتر": "Target riser height in centimeters",
+  "القيمة بالمتر": "Value in meters",
+  "تنزيل وتثبيت معماري": "Download and install Mimari",
+  "خروج": "Sign out",
+  "العناصر:": "Elements:",
+  "تعذر تسجيل الخروج:": "Unable to sign out:",
+  "تسجيل الخروج؟ احفظ تعديلاتك أولًا.": "Sign out? Save your changes first.",
+  "فتح المشروع؟ احفظ التعديلات الحالية أولًا.": "Open this project? Save current changes first.",
+  "التقدير مبدئي ولا يزيل تداخل المساحات.": "Preliminary estimate; overlapping areas are not deducted.",
+  "الأرض:": "Plot:",
+  "الغرف:": "Rooms:",
+  "الحديقة:": "Garden:",
+  "الممرات:": "Paths:",
+  "المسابح:": "Pools:",
+  "المواقف:": "Parking:",
+  "الأشجار:": "Trees:",
+  "المساحات لا تزيل التداخل.": "Overlapping areas are not deducted.",
+  "الطول:": "Length:",
+  "مساحة الوجهين:": "Both sides area:",
+  "الحجم:": "Volume:",
+  "لا يخصم الفتحات أو التقاطعات.": "Openings and intersections are not deducted.",
+  "القوائم:": "Risers:",
+  "ارتفاع القائمة:": "Riser height:",
+  "النائمة التقريبية:": "Approximate tread:",
+  "يلزم مراجعة الكود المحلي.": "Check the local building code.",
+  "إجمالي مساحات الغرف:": "Total room area:",
+  "عدد الغرف:": "Room count:",
+  "أطوال الجدران:": "Wall lengths:",
+  "التكلفة التقديرية:": "Estimated cost:",
+  "عنصر": "elements",
+  "الشبكة: ١ متر": "Grid: 1 m",
+  "٪": "%",
+  "اختر أداة ثم اضغط واسحب على المخطط.\nالتحديد يسمح بتحريك العنصر أو تعديل أبعاده.\nاستخدم إصبعين للتكبير والتصغير على الهاتف.\nالحفظ محلي دون إنترنت، والحفظ السحابي يحتاج اتصالًا وتسجيل الدخول.\nصدّر JSON للاحتفاظ بنسخة احتياطية.\nالتخطيط مبدئي وغير صالح للتنفيذ الإنشائي دون مراجعة مختص.": "Select a tool, then press and drag on the plan.\nSelect / move lets you move elements or edit their dimensions.\nUse two fingers to zoom on a phone.\nLocal saving works offline; cloud saving requires a connection and sign-in.\nExport JSON to keep a backup.\nThis is preliminary planning and requires professional review before construction.",
+  "بعد رفع جميع الملفات إلى Netlify أو GitHub Pages باستخدام HTTPS، افتح الموقع على هاتفك.\nفي أندرويد: قائمة المتصفح ← تثبيت التطبيق.\nفي آيفون: مشاركة ← إضافة إلى الشاشة الرئيسية.\nيمكن الرسم دون إنترنت بعد أول تحميل، بينما الحفظ السحابي يتطلب اتصالًا.": "Upload all app files to Netlify or GitHub Pages over HTTPS, then open the site on your phone.\nAndroid: browser menu → Install app.\niPhone: Share → Add to Home Screen.\nOffline drawing requires the original service worker and cached app files; cloud saving requires a connection.",
+  "عنصر • الشبكة: ١ متر • التكبير": "elements • Grid: 1 m • Zoom",
+  "٪ •": "% •",
+  "(م)": "(m)",
+  "م²\nعدد الغرف:": "m²\nRoom count:",
+  "م\nالتكلفة التقديرية:": "m\nEstimated cost:",
+  "م²\nالغرف:": "m²\nRooms:",
+  "م²\nالحديقة:": "m²\nGarden:",
+  "م²\nالممرات:": "m²\nPaths:",
+  "م²\nالمسابح:": "m²\nPools:",
+  "م²\nالمواقف:": "m²\nParking:",
+  "م²\nالأشجار:": "m²\nTrees:",
+  "م\nمساحة الوجهين:": "m\nBoth sides area:",
+  "م²\nالحجم:": "m²\nVolume:",
+  "م³\nلا يخصم الفتحات أو التقاطعات.": "m³\nOpenings and intersections are not deducted.",
+  "سم\nالنائمة التقريبية:": "cm\nApproximate tread:",
+  "سم\nيلزم مراجعة الكود المحلي.": "cm\nCheck the local building code.",
+  "· خروج": "· Sign out",
+  "— المعروض نسخ محلية": "— Showing local copies",
+  "/ مخطط ثنائي الأبعاد": "/ 2D floor plan",
+  "تصدير DXF": "Export DXF",
+  "بيانات تسجيل الدخول غير صحيحة": "Invalid login credentials",
+  "البريد الإلكتروني غير مؤكد": "Email not confirmed",
+  "هذا البريد مسجل بالفعل": "User already registered",
+  "طلبات كثيرة، حاول لاحقًا": "Too many requests",
+  "كلمة المرور غير كافية الطول": "Password should be at least 8 characters."
+};
+const reverseUI=Object.fromEntries(Object.entries(uiDictionary).map(([ar,en])=>[en,ar]));
+function canonicalUI(value){return reverseUI[value]||value}
+function tr(value){let s=String(value),key=s.trim();return document.documentElement.lang==='en'&&Object.hasOwn(uiDictionary,key)?s.replace(key,uiDictionary[key]):s}
+document.documentElement.lang=localStorage.getItem('mimari-language')==='en'?'en':'ar';document.documentElement.dir=document.documentElement.lang==='en'?'ltr':'rtl';
+const staticText=[],staticAttrs=[];
+{let walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT),n;while(n=walker.nextNode()){if(!n.parentElement.closest('script,style,#projects,#langBtn'))staticText.push([n,n.nodeValue]);}for(let el of document.querySelectorAll('[aria-label],[placeholder]'))for(let a of ['aria-label','placeholder'])if(el.hasAttribute(a))staticAttrs.push([el,a,el.getAttribute(a)]);}
+let dialogState=null,dialogRefresh=null;
+function paintDialog(){if(!dialogState)return;document.getElementById('dialogTitle').textContent=tr(dialogState.title);document.getElementById('help').textContent=typeof dialogState.content==='function'?dialogState.content():tr(dialogState.content)}
+</script>
 <script>
 'use strict';
 const $=id=>document.getElementById(id),c=$('canvas'),ctx=c.getContext('2d'),hiddenLayers=new Set();
 const labels={select:'تحديد / تحريك',wall:'جدار',room:'غرفة',door:'باب',window:'نافذة',line:'خط',measure:'قياس',text:'نص',stairs:'سلم',circle:'دائرة',plot:'حدود الأرض',garden:'حديقة',path:'ممر',pool:'مسبح',parking:'موقف سيارة',tree:'شجرة'};
 let scale=40,tool='select',items=[],selected=-1,start=null,preview=null,history=[],future=[],projectId=crypto.randomUUID(),offset={x:70,y:100},drag=null,lang=localStorage.getItem('mimari-language')||'ar';
-Object.entries(labels).forEach(([key,title])=>{let b=document.createElement('button');b.textContent=title;b.dataset.tool=key;b.onclick=()=>{tool=key;document.querySelectorAll('[data-tool]').forEach(x=>x.classList.toggle('active',x===b));$('mode').textContent=title};$('tools').append(b)});document.querySelector('[data-tool]').classList.add('active');
+Object.entries(labels).forEach(([key,title])=>{let b=document.createElement('button');b.textContent=tr(title);b.dataset.tool=key;b.onclick=()=>{tool=key;document.querySelectorAll('[data-tool]').forEach(x=>x.classList.toggle('active',x===b));$('mode').textContent=tr(labels[tool])};$('tools').append(b)});document.querySelector('[data-tool]').classList.add('active');
 function toast(t){$('toast').textContent=t;$('toast').style.display='block';clearTimeout(window.tt);window.tt=setTimeout(()=>$('toast').style.display='none',2700)}
 function checkpoint(){history.push(JSON.stringify(items));if(history.length>80)history.shift();future=[]}
 function undo(){if(history.length){future.push(JSON.stringify(items));items=JSON.parse(history.pop());selected=-1;render()}}
@@ -95,50 +345,50 @@ function pos(e){let r=c.getBoundingClientRect(),x=(e.clientX-r.left-offset.x)/sc
 function render(){let r=c.getBoundingClientRect();if(!r.width||!r.height)return;let d=Math.min(devicePixelRatio||1,3);c.width=Math.round(r.width*d);c.height=Math.round(r.height*d);ctx.setTransform(d,0,0,d,0,0);ctx.clearRect(0,0,r.width,r.height);
 if($('grid').checked){ctx.strokeStyle='#35415b';ctx.lineWidth=.6;for(let x=((offset.x%scale)+scale)%scale;x<r.width;x+=scale){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,r.height);ctx.stroke()}for(let y=((offset.y%scale)+scale)%scale;y<r.height;y+=scale){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(r.width,y);ctx.stroke()}}
 ctx.save();ctx.translate(offset.x,offset.y);ctx.scale(scale,scale);items.forEach((v,i)=>{if(!hiddenLayers.has(v.type))draw(v,i===selected)});if(preview)draw(preview,true);ctx.restore();
-if(!items.length){ctx.fillStyle='#dce3f7';ctx.textAlign='center';ctx.font='bold 17px Tahoma';ctx.fillText('ابدأ بأرضك، وارسم فكرتك',r.width/2,r.height/2-22);ctx.font='12px Tahoma';ctx.fillText('اختر حدود الأرض ثم اسحب للرسم',r.width/2,r.height/2+10)}
-$('status').textContent=`${items.length} عنصر • الشبكة: ١ متر • التكبير ${Math.round(scale/40*100)}٪ • ${labels[tool]}`;
-$('selected').textContent=selected>=0?`${labels[items[selected].type]} — ${Math.abs(items[selected].w||0).toFixed(2)} × ${Math.abs(items[selected].h||0).toFixed(2)} م`:'اضغط على عنصر لتحديده';updateProperties()}
+if(!items.length){ctx.fillStyle='#dce3f7';ctx.textAlign='center';ctx.font='bold 17px Tahoma';ctx.fillText(tr('ابدأ بأرضك، وارسم فكرتك'),r.width/2,r.height/2-22);ctx.font='12px Tahoma';ctx.fillText(tr('اختر حدود الأرض ثم اسحب للرسم'),r.width/2,r.height/2+10)}
+$('status').textContent=`${items.length}${tr(" عنصر • الشبكة: ١ متر • التكبير ")}${Math.round(scale/40*100)}${tr("٪ • ")}${tr(labels[tool])}`;
+$('selected').textContent=selected>=0?`${tr(labels[items[selected].type])} — ${Math.abs(items[selected].w||0).toFixed(2)} × ${Math.abs(items[selected].h||0).toFixed(2)}${tr(" م")}`:tr('اضغط على عنصر لتحديده');updateProperties()}
 function draw(v,active){let x=v.x,y=v.y,w=v.w||0,h=v.h||0;ctx.save();ctx.strokeStyle=active?'#c8b7ff':'#c3d3e7';ctx.fillStyle='#2c405b';ctx.lineWidth=.04;ctx.beginPath();
-if(['plot','garden','path','pool','parking','room'].includes(v.type)){let colors={plot:'#9b88df22',garden:'#46996677',path:'#cbb99188',pool:'#449fcb88',parking:'#7f8c9b55',room:'#41546c77'};ctx.fillStyle=colors[v.type];ctx.fillRect(x,y,w,h);ctx.strokeRect(x,y,w,h);ctx.fillStyle='#edf2ff';ctx.textAlign='center';ctx.font='.29px Tahoma';ctx.fillText(v.text||labels[v.type],x+w/2,y+h/2);ctx.font='.21px Tahoma';ctx.fillText(Math.abs(w*h).toFixed(2)+' م²',x+w/2,y+h/2+.35)}
+if(['plot','garden','path','pool','parking','room'].includes(v.type)){let colors={plot:'#9b88df22',garden:'#46996677',path:'#cbb99188',pool:'#449fcb88',parking:'#7f8c9b55',room:'#41546c77'};ctx.fillStyle=colors[v.type];ctx.fillRect(x,y,w,h);ctx.strokeRect(x,y,w,h);ctx.fillStyle='#edf2ff';ctx.textAlign='center';ctx.font='.29px Tahoma';ctx.fillText(v.text??tr(labels[v.type]),x+w/2,y+h/2);ctx.font='.21px Tahoma';ctx.fillText(Math.abs(w*h).toFixed(2)+tr(' م²'),x+w/2,y+h/2+.35)}
 else if(v.type==='tree'){ctx.fillStyle='#429d67aa';ctx.arc(x,y,.6,0,Math.PI*2);ctx.fill();ctx.stroke()}
 else if(v.type==='circle'){ctx.arc(x,y,Math.abs(w),0,Math.PI*2);ctx.stroke()}
-else if(['wall','line','measure'].includes(v.type)){ctx.lineWidth=v.type==='wall'?(v.thickness||.2):.04;ctx.moveTo(x,y);ctx.lineTo(x+w,y+h);ctx.stroke();if(v.type==='measure'){ctx.fillStyle='#e6e2ff';ctx.font='.27px Tahoma';ctx.fillText(Math.hypot(w,h).toFixed(2)+' م',x+w/2,y+h/2-.2)}}
+else if(['wall','line','measure'].includes(v.type)){ctx.lineWidth=v.type==='wall'?(v.thickness||.2):.04;ctx.moveTo(x,y);ctx.lineTo(x+w,y+h);ctx.stroke();if(v.type==='measure'){ctx.fillStyle='#e6e2ff';ctx.font='.27px Tahoma';ctx.fillText(Math.hypot(w,h).toFixed(2)+tr(' م'),x+w/2,y+h/2-.2)}}
 else if(v.type==='text'){ctx.fillStyle='#e5eaff';ctx.font='.35px Tahoma';ctx.fillText(v.text||'',x,y)}
 else if(v.type==='door'){ctx.moveTo(x,y+1);ctx.lineTo(x,y);ctx.lineTo(x+1,y);ctx.stroke();ctx.beginPath();ctx.arc(x,y,1,0,Math.PI/2);ctx.stroke()}
 else if(v.type==='window'){ctx.strokeStyle='#8fd8e8';ctx.strokeRect(x,y,1.2,.15)}
 else if(v.type==='stairs'){ctx.strokeRect(x,y,w,h);for(let j=1;j<9;j++){ctx.moveTo(x,y+h*j/9);ctx.lineTo(x+w,y+h*j/9)}ctx.stroke()}
-if($('showDimensions').checked&&['plot','room','garden','path','pool','parking'].includes(v.type)&&Math.abs(w*scale)>35&&Math.abs(h*scale)>35){ctx.fillStyle='#d9d0ff';ctx.textAlign='center';ctx.font=`${Math.max(.17,11/scale)}px Tahoma`;ctx.fillText(Math.abs(w).toFixed(2)+' م',x+w/2,Math.min(y,y+h)-.18);ctx.save();ctx.translate(Math.min(x,x+w)-.22,y+h/2);ctx.rotate(-Math.PI/2);ctx.fillText(Math.abs(h).toFixed(2)+' م',0,0);ctx.restore()}
+if($('showDimensions').checked&&['plot','room','garden','path','pool','parking'].includes(v.type)&&Math.abs(w*scale)>35&&Math.abs(h*scale)>35){ctx.fillStyle='#d9d0ff';ctx.textAlign='center';ctx.font=`${Math.max(.17,11/scale)}px Tahoma`;ctx.fillText(Math.abs(w).toFixed(2)+tr(' م'),x+w/2,Math.min(y,y+h)-.18);ctx.save();ctx.translate(Math.min(x,x+w)-.22,y+h/2);ctx.rotate(-Math.PI/2);ctx.fillText(Math.abs(h).toFixed(2)+tr(' م'),0,0);ctx.restore()}
 ctx.restore()}
 function hit(p){for(let i=items.length-1;i>=0;i--){let v=items[i],w=v.w||1,h=v.h||.5;if(hiddenLayers.has(v.type))continue;if(v.type==='tree'||v.type==='text'){if(Math.hypot(p.x-v.x,p.y-v.y)<.7)return i;continue}if(v.type==='circle'){if(Math.abs(Math.hypot(p.x-v.x,p.y-v.y)-Math.abs(w))<.3)return i;continue}if(['wall','line','measure'].includes(v.type)){let t=Math.max(0,Math.min(1,((p.x-v.x)*w+(p.y-v.y)*h)/(w*w+h*h||1)));if(Math.hypot(p.x-v.x-t*w,p.y-v.y-t*h)<.3)return i}else if(p.x>=Math.min(v.x,v.x+w)-.2&&p.x<=Math.max(v.x,v.x+w)+.2&&p.y>=Math.min(v.y,v.y+h)-.2&&p.y<=Math.max(v.y,v.y+h)+.2)return i}return -1}
 const pointers=new Map();let pinch=null;
-c.addEventListener('pointerdown',e=>{c.setPointerCapture(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pointers.size===2){let a=[...pointers.values()];pinch={distance:Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y),scale};start=null;preview=null;drag=null;return}let p=pos(e);if(tool==='select'){selected=hit(p);if(selected>=0){checkpoint();drag={p,x:items[selected].x,y:items[selected].y}}else{drag={pan:true,x:e.clientX,y:e.clientY,ox:offset.x,oy:offset.y}}render();return}if(['wall','room','line','measure','circle','plot','garden','path','pool','parking'].includes(tool)){start=p;return}let v={type:tool,x:p.x,y:p.y,w:1,h:1};if(tool==='text'){let t=prompt('اكتب النص');if(!t)return;v.text=t}if(tool==='stairs'){v.w=1.2;v.h=2.5}checkpoint();items.push(v);render()});
+c.addEventListener('pointerdown',e=>{c.setPointerCapture(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pointers.size===2){let a=[...pointers.values()];pinch={distance:Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y),scale};start=null;preview=null;drag=null;return}let p=pos(e);if(tool==='select'){selected=hit(p);if(selected>=0){checkpoint();drag={p,x:items[selected].x,y:items[selected].y}}else{drag={pan:true,x:e.clientX,y:e.clientY,ox:offset.x,oy:offset.y}}render();return}if(['wall','room','line','measure','circle','plot','garden','path','pool','parking'].includes(tool)){start=p;return}let v={type:tool,x:p.x,y:p.y,w:1,h:1};if(tool==='text'){let t=prompt(tr('اكتب النص'));if(!t)return;v.text=t}if(tool==='stairs'){v.w=1.2;v.h=2.5}checkpoint();items.push(v);render()});
 c.addEventListener('pointermove',e=>{if(pointers.has(e.pointerId))pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pointers.size===2&&pinch){let a=[...pointers.values()],distance=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);scale=Math.max(10,Math.min(120,pinch.scale*distance/Math.max(1,pinch.distance)));$('zoom').value=scale;render();return}let p=pos(e);if(drag){if(drag.pan){offset.x=drag.ox+e.clientX-drag.x;offset.y=drag.oy+e.clientY-drag.y}else if(selected>=0){items[selected].x=drag.x+p.x-drag.p.x;items[selected].y=drag.y+p.y-drag.p.y}render()}if(start){preview={type:tool,x:start.x,y:start.y,w:p.x-start.x,h:p.y-start.y,thickness:+$('thickness').value||.2};if(tool==='circle')preview.w=Math.hypot(preview.w,preview.h);render()}});
-c.addEventListener('pointerup',e=>{pointers.delete(e.pointerId);if(pinch){if(pointers.size<2)pinch=null;start=null;drag=null;return}if(start){let p=pos(e),v={type:tool,x:start.x,y:start.y,w:p.x-start.x,h:p.y-start.y,thickness:+$('thickness').value||.2};if(tool==='circle'){v.w=Math.hypot(v.w,v.h);v.h=v.w}if(Math.hypot(v.w,v.h)>.1){if(tool==='room')v.text=prompt('اسم الغرفة','غرفة')||'غرفة';checkpoint();items.push(v)}}start=null;preview=null;drag=null;render()});
+c.addEventListener('pointerup',e=>{pointers.delete(e.pointerId);if(pinch){if(pointers.size<2)pinch=null;start=null;drag=null;return}if(start){let p=pos(e),v={type:tool,x:start.x,y:start.y,w:p.x-start.x,h:p.y-start.y,thickness:+$('thickness').value||.2};if(tool==='circle'){v.w=Math.hypot(v.w,v.h);v.h=v.w}if(Math.hypot(v.w,v.h)>.1){if(tool==='room'){let name=prompt(tr('اسم الغرفة'),'');if(name!==null&&name!=='')v.text=name;}checkpoint();items.push(v)}}start=null;preview=null;drag=null;render()});
 c.addEventListener('pointercancel',e=>{pointers.delete(e.pointerId);start=null;preview=null;drag=null;pinch=null;render()});
 function removeSelected(){if(selected<0)return;checkpoint();items.splice(selected,1);selected=-1;render()}
 function duplicate(){if(selected<0)return;checkpoint();let v=structuredClone(items[selected]);v.x+=.5;v.y+=.5;items.push(v);selected=items.length-1;render()}
-function updateProperties(){let el=$('properties');el.replaceChildren();if(selected<0)return;let v=items[selected];['x','y','w','h'].forEach(k=>{let label=document.createElement('label');label.textContent=({x:'الموضع الأفقي',y:'الموضع الرأسي',w:'العرض / الامتداد الأفقي',h:'الطول / الامتداد الرأسي'})[k]+' (م)';let input=document.createElement('input');input.type='number';input.step='.1';input.value=v[k]||0;input.onchange=()=>{if(!Number.isFinite(+input.value))return;checkpoint();items[selected][k]=+input.value;render()};label.append(input);el.append(label)})}
+function updateProperties(){let el=$('properties');el.replaceChildren();if(selected<0)return;let v=items[selected];['x','y','w','h'].forEach(k=>{let label=document.createElement('label');label.textContent=({x:tr('الموضع الأفقي'),y:tr('الموضع الرأسي'),w:tr('العرض / الامتداد الأفقي'),h:tr('الطول / الامتداد الرأسي')})[k]+tr(' (م)');let input=document.createElement('input');input.type='number';input.step='.1';input.value=v[k]||0;input.onchange=()=>{if(!Number.isFinite(+input.value))return;checkpoint();items[selected][k]=+input.value;render()};label.append(input);el.append(label)})}
 function zoomBy(n){scale=Math.max(10,Math.min(120,scale*n));$('zoom').value=scale;render()}
 function fitPlan(){if(!items.length)return;let xs=items.flatMap(v=>[v.x,v.x+(v.w||1)]),ys=items.flatMap(v=>[v.y,v.y+(v.h||1)]),minX=Math.min(...xs),minY=Math.min(...ys),maxX=Math.max(...xs),maxY=Math.max(...ys),r=c.getBoundingClientRect();scale=Math.max(10,Math.min(100,(r.width-75)/(maxX-minX+1),(r.height-100)/(maxY-minY+1)));offset={x:35-minX*scale,y:45-minY*scale};$('zoom').value=scale;render()}
 function projectKey(){return 'mimari-projects-'+(cloudSession?.user?.id||'guest')}
 function db(){try{return JSON.parse(localStorage.getItem(projectKey())||'{}')}catch{return {}}}
 function localSave(){let all=db();all[projectId]={id:projectId,name:$('name').value,items:structuredClone(items),updated:new Date().toISOString()};localStorage.setItem(projectKey(),JSON.stringify(all))}
-function localList(){let box=$('projects');box.replaceChildren();Object.values(db()).sort((a,b)=>b.updated.localeCompare(a.updated)).forEach(p=>{let b=document.createElement('button');b.textContent=p.name;b.onclick=()=>{if(!confirm('فتح المشروع واستبدال الرسم الحالي؟'))return;projectId=p.id;items=structuredClone(p.items);$('name').value=p.name;history=[];future=[];selected=-1;render()};box.append(b)})}
-function newProject(){if(!confirm('بدء مشروع فارغ؟ احفظ الرسم الحالي أولًا.'))return;items=[];history=[];future=[];projectId=crypto.randomUUID();$('name').value='مشروع جديد';selected=-1;render()}
+function localList(){let box=$('projects');box.replaceChildren();Object.values(db()).sort((a,b)=>b.updated.localeCompare(a.updated)).forEach(p=>{let b=document.createElement('button');b.textContent=p.name;b.onclick=()=>{if(!confirm(tr('فتح المشروع واستبدال الرسم الحالي؟')))return;projectId=p.id;items=structuredClone(p.items);$('name').value=p.name;history=[];future=[];selected=-1;render()};box.append(b)})}
+function newProject(){if(!confirm(tr('بدء مشروع فارغ؟ احفظ الرسم الحالي أولًا.')))return;items=[];history=[];future=[];projectId=crypto.randomUUID();$('name').value=tr('مشروع جديد');selected=-1;render()}
 function download(data,type,name){let u=URL.createObjectURL(new Blob([data],{type})),a=document.createElement('a');a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),2000)}
-function exportJSON(){download(JSON.stringify({version:1,name:$('name').value,items},null,2),'application/json','معماري.json')}
-$('file').onchange=async e=>{try{let f=e.target.files[0];if(!f)return;let p=JSON.parse(await f.text());if(!Array.isArray(p.items)||p.items.length>10000||!p.items.every(v=>Object.hasOwn(labels,v.type)&&Number.isFinite(v.x)&&Number.isFinite(v.y)&&Math.abs(v.x)<100000&&Math.abs(v.y)<100000&&(v.w===undefined||Number.isFinite(v.w))&&(v.h===undefined||Number.isFinite(v.h))))throw Error();checkpoint();items=p.items;$('name').value=p.name||'مشروع مستورد';projectId=crypto.randomUUID();selected=-1;render();toast('تم استيراد المشروع')}catch{toast('ملف المشروع غير صالح')}e.target.value=''};
-function pdf(){toast('اختر حفظ بتنسيق PDF من نافذة الطباعة');setTimeout(()=>window.print(),250)}
+function exportJSON(){download(JSON.stringify({version:1,name:$('name').value,items},null,2),'application/json',tr('معماري.json'))}
+$('file').onchange=async e=>{try{let f=e.target.files[0];if(!f)return;let p=JSON.parse(await f.text());if(!Array.isArray(p.items)||p.items.length>10000||!p.items.every(v=>Object.hasOwn(labels,v.type)&&Number.isFinite(v.x)&&Number.isFinite(v.y)&&Math.abs(v.x)<100000&&Math.abs(v.y)<100000&&(v.w===undefined||Number.isFinite(v.w))&&(v.h===undefined||Number.isFinite(v.h))))throw Error();checkpoint();items=p.items;$('name').value=p.name||tr('مشروع مستورد');projectId=crypto.randomUUID();selected=-1;render();toast(tr('تم استيراد المشروع'))}catch{toast(tr('ملف المشروع غير صالح'))}e.target.value=''};
+function pdf(){toast(tr('اختر حفظ بتنسيق PDF من نافذة الطباعة'));setTimeout(()=>window.print(),250)}
 function esc(s){return String(s).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[ch]))}
-function downloadSVG(){if(!items.length){toast('ارسم مخططًا أولًا');return}let xs=items.flatMap(v=>[v.x,v.x+(v.w||1)]),ys=items.flatMap(v=>[v.y,v.y+(v.h||1)]),x=Math.min(...xs)-1,y=Math.min(...ys)-1,w=Math.max(...xs)-x+1,h=Math.max(...ys)-y+1;let shapes=items.map(v=>{if(v.type==='tree')return `<circle cx="${v.x}" cy="${v.y}" r=".6" fill="#a4d6ad"/>`;if(v.type==='circle')return `<circle cx="${v.x}" cy="${v.y}" r="${Math.abs(v.w)}"/>`;if(['wall','line','measure'].includes(v.type))return `<line x1="${v.x}" y1="${v.y}" x2="${v.x+v.w}" y2="${v.y+v.h}" stroke-width="${v.type==='wall'?(v.thickness||.2):.04}"/>`;if(v.type==='text')return `<text x="${v.x}" y="${v.y}" fill="black" font-size=".35">${esc(v.text)}</text>`;let a=v.type==='window'?1.2:(v.w||1),b=v.type==='window'?.15:(v.h||1);return `<rect x="${Math.min(v.x,v.x+a)}" y="${Math.min(v.y,v.y+b)}" width="${Math.abs(a)}" height="${Math.abs(b)}"/>`}).join('');download(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${x} ${y} ${w} ${h}"><rect x="${x}" y="${y}" width="${w}" height="${h}" fill="white"/><g fill="none" stroke="#182d29" stroke-width=".04">${shapes}</g></svg>`,'image/svg+xml','مخطط.svg')}
+function downloadSVG(){if(!items.length){toast(tr('ارسم مخططًا أولًا'));return}let xs=items.flatMap(v=>[v.x,v.x+(v.w||1)]),ys=items.flatMap(v=>[v.y,v.y+(v.h||1)]),x=Math.min(...xs)-1,y=Math.min(...ys)-1,w=Math.max(...xs)-x+1,h=Math.max(...ys)-y+1;let shapes=items.map(v=>{if(v.type==='tree')return `<circle cx="${v.x}" cy="${v.y}" r=".6" fill="#a4d6ad"/>`;if(v.type==='circle')return `<circle cx="${v.x}" cy="${v.y}" r="${Math.abs(v.w)}"/>`;if(['wall','line','measure'].includes(v.type))return `<line x1="${v.x}" y1="${v.y}" x2="${v.x+v.w}" y2="${v.y+v.h}" stroke-width="${v.type==='wall'?(v.thickness||.2):.04}"/>`;if(v.type==='text')return `<text x="${v.x}" y="${v.y}" fill="black" font-size=".35">${esc(v.text)}</text>`;let a=v.type==='window'?1.2:(v.w||1),b=v.type==='window'?.15:(v.h||1);return `<rect x="${Math.min(v.x,v.x+a)}" y="${Math.min(v.y,v.y+b)}" width="${Math.abs(a)}" height="${Math.abs(b)}"/>`}).join('');download(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${x} ${y} ${w} ${h}"><rect x="${x}" y="${y}" width="${w}" height="${h}" fill="white"/><g fill="none" stroke="#182d29" stroke-width=".04">${shapes}</g></svg>`,'image/svg+xml',tr('مخطط.svg'))}
 function downloadPreview(){let a=document.createElement('a');a.download='mimari-plan.png';a.href=c.toDataURL('image/png');a.click()}
 function exportDXF(){let out=['0','SECTION','2','HEADER','9','$INSUNITS','70','6','0','ENDSEC','0','SECTION','2','ENTITIES'];function line(x,y,a,b,layer){out.push('0','LINE','8',layer,'10',String(x),'20',String(-y),'30','0','11',String(a),'21',String(-b),'31','0')}items.forEach(v=>{if(v.type==='circle'){out.push('0','CIRCLE','8','circle','10',String(v.x),'20',String(-v.y),'40',String(Math.abs(v.w)))}else if(['wall','line','measure'].includes(v.type))line(v.x,v.y,v.x+v.w,v.y+v.h,v.type);else if(v.type==='text')out.push('0','TEXT','8','text','10',String(v.x),'20',String(-v.y),'40','.35','1',String(v.text||'').replace(/[\r\n]/g,' '));else{let w=v.w||1,h=v.h||1;line(v.x,v.y,v.x+w,v.y,v.type);line(v.x+w,v.y,v.x+w,v.y+h,v.type);line(v.x+w,v.y+h,v.x,v.y+h,v.type);line(v.x,v.y+h,v.x,v.y,v.type)}});out.push('0','ENDSEC','0','EOF');download(out.join('\n'),'application/dxf','mimari.dxf')}
-function showDialog(title,content){$('dialogTitle').textContent=title;$('help').textContent=content;$('dialogExtra').replaceChildren();$('dialog').showModal()}
-function showHelp(){showDialog('دليل الاستخدام','اختر أداة ثم اضغط واسحب على المخطط.\nالتحديد يسمح بتحريك العنصر أو تعديل أبعاده.\nاستخدم إصبعين للتكبير والتصغير على الهاتف.\nالحفظ محلي دون إنترنت، والحفظ السحابي يحتاج اتصالًا وتسجيل الدخول.\nصدّر JSON للاحتفاظ بنسخة احتياطية.\nالتخطيط مبدئي وغير صالح للتنفيذ الإنشائي دون مراجعة مختص.')}
-function analytics(){let rooms=items.filter(v=>v.type==='room'),area=rooms.reduce((a,v)=>a+Math.abs(v.w*v.h),0),length=items.filter(v=>v.type==='wall').reduce((a,v)=>a+Math.hypot(v.w,v.h),0);let rate=prompt('تكلفة تقريبية للمتر المربع','1500');if(rate===null)return;if(!Number.isFinite(+rate)||+rate<0)return toast('أدخل تكلفة صحيحة');showDialog('المساحات والتكلفة',`إجمالي مساحات الغرف: ${area.toFixed(2)} م²\nعدد الغرف: ${rooms.length}\nأطوال الجدران: ${length.toFixed(2)} م\nالتكلفة التقديرية: ${(area*+rate).toLocaleString('ar-EG')}\nالتقدير مبدئي ولا يزيل تداخل المساحات.`)}
-function layersPanel(){showDialog('إدارة الطبقات','');let box=$('dialogExtra');Object.entries(labels).filter(([k])=>k!=='select').forEach(([k,n])=>{let l=document.createElement('label'),i=document.createElement('input');i.type='checkbox';i.checked=!hiddenLayers.has(k);i.onchange=()=>{i.checked?hiddenLayers.delete(k):hiddenLayers.add(k);render()};l.append(i,document.createTextNode(' '+n));box.append(l)})}
-function exactDraw(){let t=prompt('النوع: plot / room / wall / garden / path / pool / parking / circle','room');if(t===null)return;if(!labels[t]||!['plot','room','wall','garden','path','pool','parking','circle','line'].includes(t))return toast('نوع غير صالح');let input=prompt('أدخل x,y,width,height بالمتر','0,0,10,8');if(input===null)return;let a=input.split(/[,\s]+/).map(Number);if(a.length!==4||a.some(n=>!Number.isFinite(n)||Math.abs(n)>100000))return toast('أبعاد غير صالحة');let v={type:t,x:a[0],y:a[1],w:a[2],h:a[3]};if(t==='circle'){if(v.w<=0)return toast('نصف القطر يجب أن يكون موجبًا');v.h=v.w}else if(!['wall','line'].includes(t)&&(v.w<=0||v.h<=0))return toast('أبعاد غير صالحة');if(t==='wall')v.thickness=+$('thickness').value||.2;checkpoint();items.push(v);selected=items.length-1;fitPlan()}
-function runCommand(){let a=$('command').value.trim().split(/[,\s]+/),name=(a.shift()||'').toUpperCase(),n=a.map(Number);if(n.some(x=>!Number.isFinite(x)))return toast('أدخل أرقامًا صالحة');let v;if(name==='LINE'&&n.length===4)v={type:'line',x:n[0],y:n[1],w:n[2]-n[0],h:n[3]-n[1]};else if(name==='CIRCLE'&&n.length===3&&n[2]>0)v={type:'circle',x:n[0],y:n[1],w:n[2],h:n[2]};else if(name==='RECT'&&n.length===4)v={type:'room',x:n[0],y:n[1],w:n[2],h:n[3],text:'غرفة'};else if(name==='ZOOM'){fitPlan();return}else return toast('LINE x1 y1 x2 y2 | CIRCLE x y r | RECT x y w h | ZOOM');checkpoint();items.push(v);render();$('command').value=''}
+function showDialog(title,content){dialogState={title:canonicalUI(title),content};dialogRefresh=null;paintDialog();$('dialogExtra').replaceChildren();if(!$('dialog').open)$('dialog').showModal()}
+function showHelp(){showDialog(tr('دليل الاستخدام'),()=>tr('اختر أداة ثم اضغط واسحب على المخطط.\nالتحديد يسمح بتحريك العنصر أو تعديل أبعاده.\nاستخدم إصبعين للتكبير والتصغير على الهاتف.\nالحفظ محلي دون إنترنت، والحفظ السحابي يحتاج اتصالًا وتسجيل الدخول.\nصدّر JSON للاحتفاظ بنسخة احتياطية.\nالتخطيط مبدئي وغير صالح للتنفيذ الإنشائي دون مراجعة مختص.'))}
+function analytics(){let rooms=items.filter(v=>v.type==='room'),area=rooms.reduce((a,v)=>a+Math.abs(v.w*v.h),0),length=items.filter(v=>v.type==='wall').reduce((a,v)=>a+Math.hypot(v.w,v.h),0);let rate=prompt(tr('تكلفة تقريبية للمتر المربع'),'1500');if(rate===null)return;if(!Number.isFinite(+rate)||+rate<0)return toast(tr('أدخل تكلفة صحيحة'));showDialog(tr('المساحات والتكلفة'),()=>`${tr("إجمالي مساحات الغرف: ")}${area.toFixed(2)}${tr(" م²\nعدد الغرف: ")}${rooms.length}${tr("\nأطوال الجدران: ")}${length.toFixed(2)}${tr(" م\nالتكلفة التقديرية: ")}${(area*+rate).toLocaleString(lang==='en'?'en-US':'ar-EG')}${tr("\nالتقدير مبدئي ولا يزيل تداخل المساحات.")}`)}
+function layersPanel(){showDialog(tr('إدارة الطبقات'),'');dialogRefresh=layersPanel;let box=$('dialogExtra');Object.entries(labels).filter(([k])=>k!=='select').forEach(([k,n])=>{let l=document.createElement('label'),i=document.createElement('input');i.type='checkbox';i.checked=!hiddenLayers.has(k);i.onchange=()=>{i.checked?hiddenLayers.delete(k):hiddenLayers.add(k);render()};l.append(i,document.createTextNode(' '+tr(n)));box.append(l)})}
+function exactDraw(){let t=prompt(tr('النوع: plot / room / wall / garden / path / pool / parking / circle'),'room');if(t===null)return;if(!labels[t]||!['plot','room','wall','garden','path','pool','parking','circle','line'].includes(t))return toast(tr('نوع غير صالح'));let input=prompt(tr('أدخل x,y,width,height بالمتر'),'0,0,10,8');if(input===null)return;let a=input.split(/[,\s]+/).map(Number);if(a.length!==4||a.some(n=>!Number.isFinite(n)||Math.abs(n)>100000))return toast(tr('أبعاد غير صالحة'));let v={type:t,x:a[0],y:a[1],w:a[2],h:a[3]};if(t==='circle'){if(v.w<=0)return toast(tr('نصف القطر يجب أن يكون موجبًا'));v.h=v.w}else if(!['wall','line'].includes(t)&&(v.w<=0||v.h<=0))return toast(tr('أبعاد غير صالحة'));if(t==='wall')v.thickness=+$('thickness').value||.2;checkpoint();items.push(v);selected=items.length-1;fitPlan()}
+function runCommand(){let a=$('command').value.trim().split(/[,\s]+/),name=(a.shift()||'').toUpperCase(),n=a.map(Number);if(n.some(x=>!Number.isFinite(x)))return toast(tr('أدخل أرقامًا صالحة'));let v;if(name==='LINE'&&n.length===4)v={type:'line',x:n[0],y:n[1],w:n[2]-n[0],h:n[3]-n[1]};else if(name==='CIRCLE'&&n.length===3&&n[2]>0)v={type:'circle',x:n[0],y:n[1],w:n[2],h:n[2]};else if(name==='RECT'&&n.length===4)v={type:'room',x:n[0],y:n[1],w:n[2],h:n[3]};else if(name==='ZOOM'){fitPlan();return}else return toast('LINE x1 y1 x2 y2 | CIRCLE x y r | RECT x y w h | ZOOM');checkpoint();items.push(v);render();$('command').value=''}
 $('command').addEventListener('keydown',e=>{if(e.key==='Enter')runCommand()});
 function toggleMenu(force){let open=force===undefined?$('drawer').hidden:force;$('drawer').hidden=!open;$('veil').hidden=!open;$('menuBtn').setAttribute('aria-expanded',String(open))}
 function switchTheme(){document.body.classList.toggle('night');localStorage.setItem('mimari-theme',document.body.classList.contains('night')?'night':'day')}
@@ -146,20 +396,20 @@ if(localStorage.getItem('mimari-theme')==='night')document.body.classList.add('n
 function switchLanguage(){lang=lang==='ar'?'en':'ar';localStorage.setItem('mimari-language',lang);applyLanguage();render()}
 const phases=['دراسة الموقع','التصميم المبدئي','التصميم والتنسيق','التراخيص','الكميات والتعاقد','التنفيذ','الاستلام والتسليم'];
 function workflowKey(){return projectKey()+'-workflow-'+projectId}
-function projectHub(){showDialog('دورة المشروع والمهام','');let box=$('dialogExtra'),data={};try{data=JSON.parse(localStorage.getItem(workflowKey())||'{}')}catch{}phases.forEach((p,i)=>{let div=document.createElement('div');div.className='metric';let h=document.createElement('h3');h.textContent=(i+1)+'. '+p;div.append(h);['المراجعة','الاعتماد','التوثيق'].forEach((t,j)=>{let l=document.createElement('label'),check=document.createElement('input');check.type='checkbox';check.checked=!!data[i+'-'+j];check.onchange=()=>{data[i+'-'+j]=check.checked;localStorage.setItem(workflowKey(),JSON.stringify(data))};l.append(check,document.createTextNode(' '+t));div.append(l)});let note=document.createElement('textarea');note.placeholder='ملاحظات المرحلة';note.value=data['note'+i]||'';note.onchange=()=>{data['note'+i]=note.value;localStorage.setItem(workflowKey(),JSON.stringify(data))};div.append(note);box.append(div)})}
-function siteSummary(){let area=t=>items.filter(v=>v.type===t).reduce((a,v)=>a+Math.abs(v.w*v.h),0);showDialog('ملخص الموقع والمساحات',`الأرض: ${area('plot').toFixed(2)} م²\nالغرف: ${area('room').toFixed(2)} م²\nالحديقة: ${area('garden').toFixed(2)} م²\nالممرات: ${area('path').toFixed(2)} م²\nالمسابح: ${area('pool').toFixed(2)} م²\nالمواقف: ${area('parking').toFixed(2)} م²\nالأشجار: ${items.filter(v=>v.type==='tree').length}\nالمساحات لا تزيل التداخل.`)}
-function roomSchedule(){showDialog('جدول الغرف والتشطيبات','');let box=$('dialogExtra');items.filter(v=>v.type==='room').forEach(v=>{let l=document.createElement('label');l.textContent=(v.text||'غرفة')+' — '+Math.abs(v.w*v.h).toFixed(2)+' م²';let s=document.createElement('select');['غير محدد','بورسلين','سيراميك','رخام','باركيه','موكيت'].forEach(t=>{let o=document.createElement('option');o.textContent=t;s.append(o)});s.value=v.finish||'غير محدد';s.onchange=()=>{checkpoint();v.finish=s.value};l.append(s);box.append(l)})}
-function csvSchedule(){let rows=[['الغرفة','العرض م','الطول م','المساحة م²','تشطيب الأرضية'],...items.filter(v=>v.type==='room').map(v=>[v.text||'غرفة',v.w,v.h,Math.abs(v.w*v.h).toFixed(2),v.finish||'غير محدد'])];download('\uFEFF'+rows.map(r=>r.map(x=>'"'+String(x).replace(/"/g,'""')+'"').join(',')).join('\r\n'),'text/csv;charset=utf-8','mimari-rooms.csv')}
-function wallEstimate(){let h=Number(prompt('ارتفاع الجدران بالمتر','3'));if(!(h>0))return;let walls=items.filter(v=>v.type==='wall'),len=walls.reduce((a,v)=>a+Math.hypot(v.w,v.h),0),vol=walls.reduce((a,v)=>a+Math.hypot(v.w,v.h)*(v.thickness||.2)*h,0);showDialog('كميات الجدران',`الطول: ${len.toFixed(2)} م\nمساحة الوجهين: ${(len*h*2).toFixed(2)} م²\nالحجم: ${vol.toFixed(2)} م³\nلا يخصم الفتحات أو التقاطعات.`)}
-function stairCalc(){let rise=Number(prompt('ارتفاع الطابق بالمتر','3')),target=Number(prompt('ارتفاع القائمة المستهدف بالسنتيمتر','17'));if(!(rise>0&&target>0))return;let count=Math.max(1,Math.round(rise*100/target)),r=rise*100/count;showDialog('حاسبة السلم',`القوائم: ${count}\nارتفاع القائمة: ${r.toFixed(2)} سم\nالنائمة التقريبية: ${(63-2*r).toFixed(2)} سم\nيلزم مراجعة الكود المحلي.`)}
-function reportProject(){let rooms=items.filter(v=>v.type==='room');download('\uFEFF'+['تقرير مشروع معماري',$('name').value,new Date().toLocaleString('ar-EG'),'العناصر: '+items.length,...rooms.map(v=>(v.text||'غرفة')+': '+Math.abs(v.w*v.h).toFixed(2)+' م²'),'تقرير تخطيطي مبدئي فقط'].join('\n'),'text/plain;charset=utf-8','mimari-report.txt')}
-function editLabel(){if(selected<0)return toast('حدد عنصرًا');let t=prompt('الاسم',items[selected].text||labels[items[selected].type]);if(t===null)return;checkpoint();items[selected].text=t;render()}
+function projectHub(){showDialog(tr('دورة المشروع والمهام'),'');dialogRefresh=projectHub;let box=$('dialogExtra'),data={};try{data=JSON.parse(localStorage.getItem(workflowKey())||'{}')}catch{}phases.forEach((p,i)=>{let div=document.createElement('div');div.className='metric';let h=document.createElement('h3');h.textContent=(i+1)+'. '+tr(p);div.append(h);[tr('المراجعة'),tr('الاعتماد'),tr('التوثيق')].forEach((t,j)=>{let l=document.createElement('label'),check=document.createElement('input');check.type='checkbox';check.checked=!!data[i+'-'+j];check.onchange=()=>{data[i+'-'+j]=check.checked;localStorage.setItem(workflowKey(),JSON.stringify(data))};l.append(check,document.createTextNode(' '+t));div.append(l)});let note=document.createElement('textarea');note.placeholder=tr('ملاحظات المرحلة');note.value=data['note'+i]||'';note.oninput=()=>{data['note'+i]=note.value;localStorage.setItem(workflowKey(),JSON.stringify(data))};div.append(note);box.append(div)})}
+function siteSummary(){let area=t=>items.filter(v=>v.type===t).reduce((a,v)=>a+Math.abs(v.w*v.h),0);showDialog(tr('ملخص الموقع والمساحات'),()=>`${tr("الأرض: ")}${area('plot').toFixed(2)}${tr(" م²\nالغرف: ")}${area('room').toFixed(2)}${tr(" م²\nالحديقة: ")}${area('garden').toFixed(2)}${tr(" م²\nالممرات: ")}${area('path').toFixed(2)}${tr(" م²\nالمسابح: ")}${area('pool').toFixed(2)}${tr(" م²\nالمواقف: ")}${area('parking').toFixed(2)}${tr(" م²\nالأشجار: ")}${items.filter(v=>v.type==='tree').length}${tr("\nالمساحات لا تزيل التداخل.")}`)}
+function roomSchedule(){showDialog(tr('جدول الغرف والتشطيبات'),'');dialogRefresh=roomSchedule;let box=$('dialogExtra');items.filter(v=>v.type==='room').forEach(v=>{let l=document.createElement('label');l.textContent=(v.text??tr(tr('غرفة')))+' — '+Math.abs(v.w*v.h).toFixed(2)+tr(' م²');let s=document.createElement('select');['غير محدد','بورسلين','سيراميك','رخام','باركيه','موكيت'].forEach(t=>{let o=document.createElement('option');o.value=t;o.textContent=tr(t);s.append(o)});s.value=v.finish||'غير محدد';s.onchange=()=>{checkpoint();v.finish=s.value};l.append(s);box.append(l)})}
+function csvSchedule(){let rows=[[tr('الغرفة'),tr('العرض م'),tr('الطول م'),tr('المساحة م²'),tr('تشطيب الأرضية')],...items.filter(v=>v.type==='room').map(v=>[v.text??tr(tr('غرفة')),v.w,v.h,Math.abs(v.w*v.h).toFixed(2),tr(v.finish||'غير محدد')])];download('\uFEFF'+rows.map(r=>r.map(x=>'"'+String(x).replace(/"/g,'""')+'"').join(',')).join('\r\n'),'text/csv;charset=utf-8','mimari-rooms.csv')}
+function wallEstimate(){let h=Number(prompt(tr('ارتفاع الجدران بالمتر'),'3'));if(!(h>0))return;let walls=items.filter(v=>v.type==='wall'),len=walls.reduce((a,v)=>a+Math.hypot(v.w,v.h),0),vol=walls.reduce((a,v)=>a+Math.hypot(v.w,v.h)*(v.thickness||.2)*h,0);showDialog(tr('كميات الجدران'),()=>`${tr("الطول: ")}${len.toFixed(2)}${tr(" م\nمساحة الوجهين: ")}${(len*h*2).toFixed(2)}${tr(" م²\nالحجم: ")}${vol.toFixed(2)}${tr(" م³\nلا يخصم الفتحات أو التقاطعات.")}`)}
+function stairCalc(){let rise=Number(prompt(tr('ارتفاع الطابق بالمتر'),'3')),target=Number(prompt(tr('ارتفاع القائمة المستهدف بالسنتيمتر'),'17'));if(!(rise>0&&target>0))return;let count=Math.max(1,Math.round(rise*100/target)),r=rise*100/count;showDialog(tr('حاسبة السلم'),()=>`${tr("القوائم: ")}${count}${tr("\nارتفاع القائمة: ")}${r.toFixed(2)}${tr(" سم\nالنائمة التقريبية: ")}${(63-2*r).toFixed(2)}${tr(" سم\nيلزم مراجعة الكود المحلي.")}`)}
+function reportProject(){let rooms=items.filter(v=>v.type==='room');download('\uFEFF'+[tr('تقرير مشروع معماري'),$('name').value,new Date().toLocaleString(lang==='en'?'en-US':'ar-EG'),tr('العناصر: ')+items.length,...rooms.map(v=>(v.text??tr(tr('غرفة')))+': '+Math.abs(v.w*v.h).toFixed(2)+tr(' م²')),tr('تقرير تخطيطي مبدئي فقط')].join('\n'),'text/plain;charset=utf-8','mimari-report.txt')}
+function editLabel(){if(selected<0)return toast(tr('حدد عنصرًا'));let t=prompt(tr('الاسم'),items[selected].text??tr(labels[items[selected].type]));if(t===null)return;checkpoint();items[selected].text=t;render()}
 function rotateSelected(){if(selected<0)return;checkpoint();let v=items[selected],w=v.w;v.w=-v.h;v.h=w;render()}
 function mirrorSelected(){if(selected<0)return;checkpoint();items[selected].w=-items[selected].w;render()}
-function unitConvert(){let n=Number(prompt('القيمة بالمتر','1'));if(!Number.isFinite(n))return;showDialog('تحويل الوحدات',`${n} متر\n${n*100} سم\n${n*1000} مم\n${(n*3.280839895).toFixed(4)} قدم`)}
-function installHelp(){showDialog('تنزيل وتثبيت معماري','بعد رفع جميع الملفات إلى Netlify أو GitHub Pages باستخدام HTTPS، افتح الموقع على هاتفك.\nفي أندرويد: قائمة المتصفح ← تثبيت التطبيق.\nفي آيفون: مشاركة ← إضافة إلى الشاشة الرئيسية.\nيمكن الرسم دون إنترنت بعد أول تحميل، بينما الحفظ السحابي يتطلب اتصالًا.')}
+function unitConvert(){let n=Number(prompt(tr('القيمة بالمتر'),'1'));if(!Number.isFinite(n))return;showDialog(tr('تحويل الوحدات'),()=>`${n}${tr(" متر\n")}${n*100}${tr(" سم\n")}${n*1000}${tr(" مم\n")}${(n*3.280839895).toFixed(4)}${tr(" قدم")}`)}
+function installHelp(){showDialog(tr('تنزيل وتثبيت معماري'),()=>tr('بعد رفع جميع الملفات إلى Netlify أو GitHub Pages باستخدام HTTPS، افتح الموقع على هاتفك.\nفي أندرويد: قائمة المتصفح ← تثبيت التطبيق.\nفي آيفون: مشاركة ← إضافة إلى الشاشة الرئيسية.\nيمكن الرسم دون إنترنت بعد أول تحميل، بينما الحفظ السحابي يتطلب اتصالًا.'))}
 const menuActions=[['دورة المشروع والمهام',projectHub],['تنزيل وتثبيت التطبيق',installHelp],['مشروع جديد',newProject],['حفظ المشروع',()=>save()],['جدول الغرف والتشطيبات',roomSchedule],['تصدير جدول CSV',csvSchedule],['كميات الجدران',wallEstimate],['حاسبة السلم',stairCalc],['تحويل الوحدات',unitConvert],['تعديل اسم المساحة',editLabel],['تدوير العنصر ٩٠ درجة',rotateSelected],['عكس العنصر',mirrorSelected],['تقرير المشروع TXT',reportProject],['ملخص الموقع والمساحات',siteSummary],['المساحات والتكلفة',analytics],['إدارة الطبقات',layersPanel],['إظهار المخطط بالكامل',fitPlan],['تصدير DXF',exportDXF],['صورة المخطط PNG',downloadPreview],['رسم SVG',downloadSVG],['تصدير المشروع JSON',exportJSON],['طباعة / PDF',pdf],['الحساب',()=>openAuth()]];
-menuActions.forEach(([t,fn])=>{let b=document.createElement('button');b.textContent=t;b.onclick=()=>{toggleMenu(false);fn()};$('navActions').append(b)});
+menuActions.forEach(([t,fn])=>{let b=document.createElement('button');b.textContent=tr(t);b.dataset.menuTitle=t;b.onclick=()=>{toggleMenu(false);fn()};$('navActions').append(b)});
 document.addEventListener('keydown',e=>{if(['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName))return;if(e.ctrlKey&&['z','y','s'].includes(e.key.toLowerCase())){e.preventDefault();({z:undo,y:redo,s:save})[e.key.toLowerCase()]()}if(e.key==='Delete')removeSelected();if(e.key==='Escape'){if(!$('drawer').hidden)toggleMenu(false);start=null;preview=null;render()}});
 window.addEventListener('resize',render);window.addEventListener('beforeprint',()=>{$('grid').dataset.old=String($('grid').checked);$('grid').checked=false;render()});window.addEventListener('afterprint',()=>{$('grid').checked=$('grid').dataset.old==='true';render()});
 </script>
@@ -170,151 +420,17 @@ const SUPABASE_PUBLISHABLE_KEY='sb_publishable_20sF_DuGWbFifOTOInolGA_CAUXYa4G';
 let cloudSession=null,refreshPromise=null,signingUp=false,cloudListVersion=0;
 try{cloudSession=JSON.parse(sessionStorage.getItem('mimari-supabase-session')||'null')}catch{}
 function storeSession(s){cloudSession=s?.access_token?{access_token:s.access_token,refresh_token:s.refresh_token,expires_at:s.expires_at||Math.floor(Date.now()/1000)+(s.expires_in||3600),user:s.user}:null;if(cloudSession)sessionStorage.setItem('mimari-supabase-session',JSON.stringify(cloudSession));else sessionStorage.removeItem('mimari-supabase-session');accountUI()}
-function accountUI(){$('accountBtn').textContent=cloudSession?.user?((cloudSession.user.user_metadata?.full_name||cloudSession.user.email||'User')+' · خروج'):'تسجيل الدخول'}
-async function supaRequest(path,{method='GET',body,auth=false,headers={},retry=true}={}){if(auth)await validSession();let ctrl=new AbortController(),timer=setTimeout(()=>ctrl.abort(),20000);try{let h={apikey:SUPABASE_PUBLISHABLE_KEY,...headers};if(body!==undefined)h['Content-Type']='application/json';if(auth)h.Authorization='Bearer '+cloudSession.access_token;let r=await fetch(SUPABASE_URL+path,{method,headers:h,body:body===undefined?undefined:JSON.stringify(body),signal:ctrl.signal});let raw=await r.text(),data=null;try{data=raw?JSON.parse(raw):null}catch{}if(!r.ok){if(r.status===401&&auth&&retry&&cloudSession?.refresh_token){await refreshCloudSession();return supaRequest(path,{method,body,auth,headers,retry:false})}throw Error(data?.msg||data?.message||data?.error_description||data?.error||('HTTP '+r.status))}return data}catch(e){if(e.name==='AbortError')throw Error('انتهت مهلة الاتصال');if(e instanceof TypeError)throw Error('تعذر الاتصال بـ Supabase');throw e}finally{clearTimeout(timer)}}
-async function refreshCloudSession(){if(refreshPromise)return refreshPromise;refreshPromise=(async()=>{if(!cloudSession?.refresh_token)throw Error('سجّل الدخول أولًا');let s=await supaRequest('/auth/v1/token?grant_type=refresh_token',{method:'POST',body:{refresh_token:cloudSession.refresh_token}});storeSession(s)})();try{return await refreshPromise}finally{refreshPromise=null}}
-async function validSession(){if(!cloudSession?.access_token)throw Error('سجّل الدخول أولًا');if(cloudSession.expires_at<Date.now()/1000+60)await refreshCloudSession()}
-async function openAuth(){if(cloudSession){if(!confirm('تسجيل الخروج؟ احفظ تعديلاتك أولًا.'))return;try{await supaRequest('/auth/v1/logout?scope=local',{method:'POST',auth:true})}catch(e){toast('تعذر تسجيل الخروج: '+e.message);return}storeSession(null);items=[];projectId=crypto.randomUUID();selected=-1;history=[];future=[];list();render();return}authMode(false);$('auth').showModal()}
-function authMode(mode){signingUp=mode;$('fullLabel').hidden=!mode;$('fullName').required=mode;$('authTitle').textContent=mode?'أنشئ مساحة عملك':'أهلًا بعودتك';$('authMsg').textContent=''}
-$('authForm').onsubmit=async e=>{e.preventDefault();let b=e.submitter;b.disabled=true;$('authMsg').textContent='جارٍ الاتصال…';try{let email=$('email').value.trim().toLowerCase(),password=$('password').value;let s=await supaRequest(signingUp?'/auth/v1/signup':'/auth/v1/token?grant_type=password',{method:'POST',body:signingUp?{email,password,data:{full_name:$('fullName').value.trim()}}:{email,password}});$('password').value='';if(!s?.access_token){$('authMsg').textContent='تحقق من بريدك الإلكتروني ثم سجّل الدخول، إذا كان التأكيد مفعلًا.';return}storeSession(s);items=[];projectId=crypto.randomUUID();selected=-1;history=[];future=[];$('auth').close();render();await list();toast('تم تسجيل الدخول')}catch(e){$('authMsg').textContent=e.message}finally{b.disabled=false}};
-async function save(){let backup=false;try{localSave();backup=true}catch{}if(!cloudSession){localList();toast(backup?'تم الحفظ محليًا. سجّل الدخول للحفظ السحابي.':'تعذر الحفظ المحلي، صدّر JSON');return}let owner=cloudSession.user.id,row={id:projectId,user_id:owner,name:($('name').value||'Untitled').slice(0,250),drawing:{version:1,items:structuredClone(items)},workflow:(()=>{try{return JSON.parse(localStorage.getItem(workflowKey())||'{}')}catch{return {}}})()};$('cloudStatus').textContent='جارٍ الحفظ السحابي…';try{await supaRequest('/rest/v1/mimari_projects?on_conflict=id',{method:'POST',auth:true,headers:{Prefer:'resolution=merge-duplicates,return=minimal'},body:row});$('cloudStatus').textContent='تم تأكيد الحفظ السحابي';toast('تم حفظ المشروع في Supabase');await list()}catch(e){$('cloudStatus').textContent=e.message;toast(backup?'فشل الحفظ السحابي؛ النسخة المحلية محفوظة.':'فشل الحفظ؛ صدّر JSON')}}
-async function list(){let seq=++cloudListVersion;if(!cloudSession){localList();$('cloudStatus').textContent='وضع محلي — سجّل الدخول للمشاريع السحابية';return}let owner=cloudSession.user.id;$('cloudStatus').textContent='جارٍ تحميل المشاريع…';try{let rows=await supaRequest('/rest/v1/mimari_projects?select=id,name,updated_at&user_id=eq.'+encodeURIComponent(owner)+'&order=updated_at.desc&limit=100',{auth:true});if(seq!==cloudListVersion||cloudSession?.user.id!==owner)return;let box=$('projects');box.replaceChildren();for(const row of rows){let b=document.createElement('button');b.textContent=row.name;b.onclick=async()=>{if(!confirm('فتح المشروع؟ احفظ التعديلات الحالية أولًا.'))return;b.disabled=true;try{let records=await supaRequest('/rest/v1/mimari_projects?id=eq.'+encodeURIComponent(row.id)+'&user_id=eq.'+encodeURIComponent(owner)+'&select=id,name,drawing,workflow&limit=1',{auth:true});let p=records?.[0];if(!p||!Array.isArray(p.drawing?.items)||!p.drawing.items.every(v=>Object.hasOwn(labels,v.type)&&Number.isFinite(v.x)&&Number.isFinite(v.y)))throw Error('ملف المشروع غير صالح');items=p.drawing.items;projectId=p.id;$('name').value=p.name;try{localStorage.setItem(workflowKey(),JSON.stringify(p.workflow||{}))}catch{}selected=-1;history=[];future=[];fitPlan();render();toast('تم فتح المشروع السحابي')}catch(e){toast(e.message)}finally{b.disabled=false}};box.append(b)}$('cloudStatus').textContent=rows.length?'مشاريعك السحابية':'لا توجد مشاريع سحابية بعد'}catch(e){if(seq!==cloudListVersion)return;localList();$('cloudStatus').textContent=e.message+' — المعروض نسخ محلية'}}
+function accountUI(){$('accountBtn').textContent=cloudSession?.user?((cloudSession.user.user_metadata?.full_name||cloudSession.user.email||'User')+tr(' · خروج')):tr('تسجيل الدخول')}
+async function supaRequest(path,{method='GET',body,auth=false,headers={},retry=true}={}){if(auth)await validSession();let ctrl=new AbortController(),timer=setTimeout(()=>ctrl.abort(),20000);try{let h={apikey:SUPABASE_PUBLISHABLE_KEY,...headers};if(body!==undefined)h['Content-Type']='application/json';if(auth)h.Authorization='Bearer '+cloudSession.access_token;let r=await fetch(SUPABASE_URL+path,{method,headers:h,body:body===undefined?undefined:JSON.stringify(body),signal:ctrl.signal});let raw=await r.text(),data=null;try{data=raw?JSON.parse(raw):null}catch{}if(!r.ok){if(r.status===401&&auth&&retry&&cloudSession?.refresh_token){await refreshCloudSession();return supaRequest(path,{method,body,auth,headers,retry:false})}throw Error(tr(canonicalUI(data?.msg||data?.message||data?.error_description||data?.error||('HTTP '+r.status))))}return data}catch(e){if(e.name==='AbortError')throw Error(tr('انتهت مهلة الاتصال'));if(e instanceof TypeError)throw Error(tr('تعذر الاتصال بـ Supabase'));throw e}finally{clearTimeout(timer)}}
+async function refreshCloudSession(){if(refreshPromise)return refreshPromise;refreshPromise=(async()=>{if(!cloudSession?.refresh_token)throw Error(tr('سجّل الدخول أولًا'));let s=await supaRequest('/auth/v1/token?grant_type=refresh_token',{method:'POST',body:{refresh_token:cloudSession.refresh_token}});storeSession(s)})();try{return await refreshPromise}finally{refreshPromise=null}}
+async function validSession(){if(!cloudSession?.access_token)throw Error(tr('سجّل الدخول أولًا'));if(cloudSession.expires_at<Date.now()/1000+60)await refreshCloudSession()}
+async function openAuth(){if(cloudSession){if(!confirm(tr('تسجيل الخروج؟ احفظ تعديلاتك أولًا.')))return;try{await supaRequest('/auth/v1/logout?scope=local',{method:'POST',auth:true})}catch(e){toast(tr('تعذر تسجيل الخروج: ')+e.message);return}storeSession(null);items=[];projectId=crypto.randomUUID();selected=-1;history=[];future=[];list();render();return}authMode(false);$('auth').showModal()}
+function authMode(mode){signingUp=mode;$('fullLabel').hidden=!mode;$('fullName').required=mode;$('authTitle').textContent=mode?tr('أنشئ مساحة عملك'):tr('أهلًا بعودتك');$('authMsg').textContent=''}
+$('authForm').onsubmit=async e=>{e.preventDefault();let b=e.submitter||$('authForm').querySelector('button[type=submit]');b.disabled=true;$('authMsg').textContent=tr('جارٍ الاتصال…');try{let email=$('email').value.trim().toLowerCase(),password=$('password').value;let s=await supaRequest(signingUp?'/auth/v1/signup':'/auth/v1/token?grant_type=password',{method:'POST',body:signingUp?{email,password,data:{full_name:$('fullName').value.trim()}}:{email,password}});$('password').value='';if(!s?.access_token){$('authMsg').textContent=tr('تحقق من بريدك الإلكتروني ثم سجّل الدخول، إذا كان التأكيد مفعلًا.');return}storeSession(s);items=[];projectId=crypto.randomUUID();selected=-1;history=[];future=[];$('auth').close();render();await list();toast(tr('تم تسجيل الدخول'))}catch(e){$('authMsg').textContent=e.message}finally{b.disabled=false}};
+async function save(){let backup=false;try{localSave();backup=true}catch{}if(!cloudSession){localList();toast(backup?tr('تم الحفظ محليًا. سجّل الدخول للحفظ السحابي.'):tr('تعذر الحفظ المحلي، صدّر JSON'));return}let owner=cloudSession.user.id,row={id:projectId,user_id:owner,name:$('name').value,drawing:{version:1,items:structuredClone(items)},workflow:(()=>{try{return JSON.parse(localStorage.getItem(workflowKey())||'{}')}catch{return {}}})()};$('cloudStatus').textContent=tr('جارٍ الحفظ السحابي…');try{await supaRequest('/rest/v1/mimari_projects?on_conflict=id',{method:'POST',auth:true,headers:{Prefer:'resolution=merge-duplicates,return=minimal'},body:row});$('cloudStatus').textContent=tr('تم تأكيد الحفظ السحابي');toast(tr('تم حفظ المشروع في Supabase'));await list()}catch(e){$('cloudStatus').textContent=e.message;toast(backup?tr('فشل الحفظ السحابي؛ النسخة المحلية محفوظة.'):tr('فشل الحفظ؛ صدّر JSON'))}}
+async function list(){let seq=++cloudListVersion;if(!cloudSession){localList();$('cloudStatus').textContent=tr('وضع محلي — سجّل الدخول للمشاريع السحابية');return}let owner=cloudSession.user.id;$('cloudStatus').textContent=tr('جارٍ تحميل المشاريع…');try{let rows=await supaRequest('/rest/v1/mimari_projects?select=id,name,updated_at&user_id=eq.'+encodeURIComponent(owner)+'&order=updated_at.desc&limit=100',{auth:true});if(seq!==cloudListVersion||cloudSession?.user.id!==owner)return;let box=$('projects');box.replaceChildren();for(const row of rows){let b=document.createElement('button');b.textContent=row.name;b.onclick=async()=>{if(!confirm(tr('فتح المشروع؟ احفظ التعديلات الحالية أولًا.')))return;b.disabled=true;try{let records=await supaRequest('/rest/v1/mimari_projects?id=eq.'+encodeURIComponent(row.id)+'&user_id=eq.'+encodeURIComponent(owner)+'&select=id,name,drawing,workflow&limit=1',{auth:true});let p=records?.[0];if(!p||!Array.isArray(p.drawing?.items)||!p.drawing.items.every(v=>Object.hasOwn(labels,v.type)&&Number.isFinite(v.x)&&Number.isFinite(v.y)))throw Error(tr('ملف المشروع غير صالح'));items=p.drawing.items;projectId=p.id;$('name').value=p.name;try{localStorage.setItem(workflowKey(),JSON.stringify(p.workflow||{}))}catch{}selected=-1;history=[];future=[];fitPlan();render();toast(tr('تم فتح المشروع السحابي'))}catch(e){toast(e.message)}finally{b.disabled=false}};box.append(b)}$('cloudStatus').textContent=rows.length?tr('مشاريعك السحابية'):tr('لا توجد مشاريع سحابية بعد')}catch(e){if(seq!==cloudListVersion)return;localList();$('cloudStatus').textContent=e.message+tr(' — المعروض نسخ محلية')}}
 accountUI();list();render();
 if('serviceWorker' in navigator&&location.protocol.startsWith('http'))window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(e=>console.warn('Service worker:',e)));
 </script>
-<script>
-/* Mimari bilingual UI. User-entered names and drawing labels are never translated. */
-const enUI = {
-'معماري':'Mimari','استوديو التصميم المعماري':'Architectural Design Studio',
-'القائمة':'Menu','الوضع الليلي':'Dark mode','تكبير':'Zoom in','تصغير':'Zoom out','إظهار الكل':'Fit all',
-'تسجيل الدخول':'Sign in','إنشاء حساب':'Create account','مشروع جديد +':'+ New project','مشروع جديد':'New project',
-'حفظ المشروع':'Save project','تصدير':'Export','تنزيل PDF ↗':'Download PDF ↗',
-'الرسم والتخطيط':'Drawing & planning','إعدادات الرسم':'Drawing settings','اسم المشروع':'Project name',
-'سُمك الجدار (م)':'Wall thickness (m)','محاذاة إلى الشبكة':'Snap to grid','إظهار الشبكة':'Show grid',
-'إظهار الأبعاد بالمتر':'Show dimensions in meters','رسم بأبعاد دقيقة':'Draw exact dimensions',
-'التكبير':'Zoom','تراجع ↶':'Undo ↶','إعادة ↷':'Redo ↷','استيراد مشروع':'Import project',
-'دليل الاستخدام':'User guide','تحديد / تحريك':'Select / move','جدار':'Wall','غرفة':'Room',
-'باب':'Door','نافذة':'Window','خط':'Line','قياس':'Measure','نص':'Text','سلم':'Stairs',
-'دائرة':'Circle','حدود الأرض':'Plot boundary','حديقة':'Garden','ممر':'Path','مسبح':'Pool',
-'موقف سيارة':'Parking','شجرة':'Tree','مخطط ثنائي الأبعاد':'2D floor plan','تنفيذ':'Run',
-'لوحة المشروع / معماري':'Project panel / Mimari','مساحة عمل':'Workspace',
-'لأفكارك المعمارية.':'For your architectural ideas.',
-'ارسم حدود الأرض والمبنى والحديقة، واحفظ كل نسخة من تصميمك.':'Draw your plot, building and garden, and save every version of your design.',
-'العنصر المحدد':'Selected element','اضغط على عنصر لتحديده':'Tap an element to select it',
-'حذف العنصر':'Delete element','نسخ العنصر':'Duplicate element','أدوات المعماري':'Architectural tools',
-'المساحات والتكلفة التقديرية':'Areas and estimated cost','تصدير مخطط DXF':'Export DXF drawing',
-'إدارة الطبقات':'Manage layers','إظهار المخطط بالكامل':'Fit entire plan',
-'تنزيل صورة المخطط PNG':'Download plan PNG','مشاريعي — محلي وسحابي':'My projects — local & cloud',
-'المشاريع المحلية متاحة دون إنترنت.':'Local projects are available offline.',
-'تنزيل رسم SVG':'Download SVG drawing','التخطيط المبدئي ثنائي الأبعاد، والوحدات بالمتر.':'Preliminary 2D planning; measurements are in meters.',
-'✕ إغلاق القائمة':'✕ Close menu','مطوّر الموقع AH13 ↗':'Developer AH13 ↗',
-'أهلًا بعودتك':'Welcome back','أنشئ مساحة عملك':'Create your workspace',
-'تسجيل الحساب والمشاريع السحابية عبر Supabase.':'Account sign-in and cloud projects powered by Supabase.',
-'الاسم':'Name','البريد الإلكتروني':'Email','كلمة المرور':'Password','متابعة':'Continue','إغلاق':'Close',
-'دورة المشروع والمهام':'Project workflow and tasks','تنزيل وتثبيت التطبيق':'Download and install app',
-'جدول الغرف والتشطيبات':'Room and finishes schedule','تصدير جدول CSV':'Export CSV schedule',
-'كميات الجدران':'Wall quantities','حاسبة السلم':'Stair calculator','تحويل الوحدات':'Unit conversion',
-'تعديل اسم المساحة':'Edit area name','تدوير العنصر ٩٠ درجة':'Rotate element 90°',
-'عكس العنصر':'Mirror element','تقرير المشروع TXT':'Project report TXT',
-'ملخص الموقع والمساحات':'Site and area summary','المساحات والتكلفة':'Areas and cost',
-'صورة المخطط PNG':'Plan image PNG','رسم SVG':'SVG drawing','تصدير المشروع JSON':'Export project JSON',
-'طباعة / PDF':'Print / PDF','الحساب':'Account','تسجيل الخروج':'Sign out',
-'دراسة الموقع':'Site study','التصميم المبدئي':'Concept design','التصميم والتنسيق':'Design and coordination',
-'التراخيص':'Permits','الكميات والتعاقد':'Quantities and contracting','التنفيذ':'Construction',
-'الاستلام والتسليم':'Handover','المراجعة':'Review','الاعتماد':'Approval','التوثيق':'Documentation',
-'ملاحظات المرحلة':'Stage notes','ملخص الموقع والمساحات':'Site and area summary',
-'غير محدد':'Not specified','بورسلين':'Porcelain','سيراميك':'Ceramic','رخام':'Marble',
-'باركيه':'Parquet','موكيت':'Carpet','الموضع الأفقي':'Horizontal position',
-'الموضع الرأسي':'Vertical position','العرض / الامتداد الأفقي':'Width / horizontal extent',
-'الطول / الامتداد الرأسي':'Length / vertical extent',
-'المشاريع المحلية متاحة دون إنترنت.':'Local projects are available offline.',
-'وضع محلي — سجّل الدخول للمشاريع السحابية':'Local mode — sign in for cloud projects',
-'جارٍ تحميل المشاريع…':'Loading projects…','مشاريعك السحابية':'Your cloud projects',
-'لا توجد مشاريع سحابية بعد':'No cloud projects yet',
-'جارٍ الحفظ السحابي…':'Saving to cloud…','تم تأكيد الحفظ السحابي':'Cloud save confirmed',
-'تم حفظ المشروع في Supabase':'Project saved to Supabase','تم تسجيل الدخول':'Signed in',
-'جارٍ الاتصال…':'Connecting…','تم استيراد المشروع':'Project imported',
-'ملف المشروع غير صالح':'Invalid project file','تم فتح المشروع السحابي':'Cloud project opened',
-'ابدأ بأرضك، وارسم فكرتك':'Start with your plot and draw your idea',
-'اختر حدود الأرض ثم اسحب للرسم':'Select Plot boundary, then drag to draw',
-'تم اختيار العربية':'Arabic selected','المساحات والتكلفة':'Areas and cost',
-'إجمالي مساحات الغرف':'Total room area','عدد الغرف':'Room count','أطوال الجدران':'Wall lengths',
-'التكلفة التقديرية':'Estimated cost','تقرير مشروع معماري':'Mimari project report',
-'تقرير تخطيطي مبدئي فقط':'Preliminary planning report only',
-'تقرير المشروع TXT':'Project report TXT','مخطط':'Plan',
-'لا توجد مشاريع سحابية بعد':'No cloud projects yet',
-'سجّل الدخول أولًا':'Sign in first','انتهت مهلة الاتصال':'Connection timed out',
-'تعذر الاتصال بـ Supabase':'Unable to connect to Supabase',
-'تم الحفظ محليًا. سجّل الدخول للحفظ السحابي.':'Saved locally. Sign in to save to the cloud.',
-'تعذر الحفظ المحلي، صدّر JSON':'Local save failed; export JSON',
-'فشل الحفظ السحابي؛ النسخة المحلية محفوظة.':'Cloud save failed; local copy is saved.',
-'فشل الحفظ؛ صدّر JSON':'Save failed; export JSON',
-'ارسم مخططًا أولًا':'Draw a plan first','أدخل تكلفة صحيحة':'Enter a valid cost',
-'حدد عنصرًا':'Select an element','نوع غير صالح':'Invalid type','أبعاد غير صالحة':'Invalid dimensions',
-'نصف القطر يجب أن يكون موجبًا':'Radius must be positive',
-'أدخل أرقامًا صالحة':'Enter valid numbers',
-'المعروض نسخ محلية':'Showing local copies',
-'اختر حفظ بتنسيق PDF من نافذة الطباعة':'Choose Save as PDF in the print dialog',
-'تسجيل الحساب والمشاريع السحابية عبر Supabase.':'Sign-in and cloud projects via Supabase.',
-'تحقق من بريدك الإلكتروني ثم سجّل الدخول، إذا كان التأكيد مفعلًا.':'Check your email and sign in if email confirmation is enabled.'
-};
-const uiOriginalText = new WeakMap();
-const uiOriginalAttr = new WeakMap();
-let applyingUI = false;
-function translateUIValue(value) {
-  const raw = String(value), v = raw.trim();
-  if (Object.hasOwn(enUI, v)) return raw.replace(v, enUI[v]);
-  let m;
-  if ((m = v.match(/^(\d+) عنصر • الشبكة: ١ متر • التكبير (\d+)٪ • (.+)$/)))
-    return `${m[1]} elements • Grid: 1 m • Zoom: ${m[2]}% • ${enUI[m[3]] || m[3]}`;
-  if ((m = v.match(/^(.+) — ([\d.]+) × ([\d.]+) م$/)))
-    return `${enUI[m[1]] || m[1]} — ${m[2]} × ${m[3]} m`;
-  if ((m = v.match(/^(.+) \(م\)$/))) return `${enUI[m[1]] || m[1]} (m)`;
-  if ((m = v.match(/^(\d+)\. (.+)$/))) return `${m[1]}. ${enUI[m[2]] || m[2]}`;
-  if (v.endsWith(' · خروج')) return v.replace(' · خروج', ' · Sign out');
-  return raw;
-}
-function applyLanguage() {
-  if (applyingUI) return;
-  applyingUI = true;
-  try {
-    const english = lang === 'en';
-    document.documentElement.lang = english ? 'en' : 'ar';
-    document.documentElement.dir = english ? 'ltr' : 'rtl';
-    document.title = english ? 'Mimari | Design Workspace' : 'معماري | مساحة التصميم';
-    $('langBtn').textContent = english ? 'العربية' : 'English';
-    document.querySelectorAll('[data-tool]').forEach(b => {
-      b.textContent = english ? enUI[labels[b.dataset.tool]] : labels[b.dataset.tool];
-    });
-    const skip = 'script,style,#projects,#name,#help,#authMsg,#email,#fullName,#password,#dialogExtra';
-    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-    let node;
-    while ((node = walker.nextNode())) {
-      const parent = node.parentElement;
-      if (!parent || parent.closest(skip) || parent.closest('[data-tool]') || parent.id === 'langBtn') continue;
-      if (!uiOriginalText.has(node)) uiOriginalText.set(node, node.nodeValue);
-      const original = uiOriginalText.get(node);
-      const output = english ? translateUIValue(original) : original;
-      if (node.nodeValue !== output) node.nodeValue = output;
-    }
-    document.querySelectorAll('[placeholder],[aria-label]').forEach(el => {
-      if (el.matches('#name,#command') || el.closest('#projects,#dialogExtra')) return;
-      if (!uiOriginalAttr.has(el)) uiOriginalAttr.set(el, {
-        placeholder: el.getAttribute('placeholder'), aria: el.getAttribute('aria-label')
-      });
-      const original = uiOriginalAttr.get(el);
-      for (const [key, attr] of [['placeholder','placeholder'],['aria','aria-label']]) {
-        if (original[key] !== null) el.setAttribute(attr, english ? translateUIValue(original[key]) : original[key]);
-      }
-    });
-    // These values are user-owned data, and are deliberately left unchanged:
-    // #name, #projects, project titles, room labels and custom canvas text.
-  } finally { applyingUI = false; }
-}
-const uiObserver = new MutationObserver(() => {
-  if (!applyingUI) applyLanguage();
-});
-uiObserver.observe(document.body, {childList:true,subtree:true,characterData:true});
-applyLanguage();
-</script>
+<script>function applyLanguage(){document.documentElement.lang=lang==='en'?'en':'ar';document.documentElement.dir=lang==='en'?'ltr':'rtl';for(let [node,original] of staticText)if(node.isConnected)node.nodeValue=tr(original);for(let [el,attr,original] of staticAttrs)el.setAttribute(attr,tr(original));document.title=lang==='en'?'Mimari | Design Workspace':'معماري | مساحة التصميم';$('langBtn').textContent=lang==='en'?'العربية':'English';document.querySelectorAll('[data-tool]').forEach(b=>b.textContent=tr(labels[b.dataset.tool]));document.querySelectorAll('[data-menu-title]').forEach(b=>b.textContent=tr(b.dataset.menuTitle));$('mode').textContent=tr(labels[tool]);accountUI();$('authTitle').textContent=tr(signingUp?'أنشئ مساحة عملك':'أهلًا بعودتك');for(let id of ['cloudStatus','authMsg','toast']){let el=$(id);el.textContent=tr(canonicalUI(el.textContent));}if($('dialog').open){if(dialogRefresh)dialogRefresh();else paintDialog();}render();}applyLanguage();</script>
 </body></html>
